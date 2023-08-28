@@ -215,7 +215,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 	// print level name and exit rules
 	string[0] = 0;
 
-	stringlength = strlen(string);
+	stringlength = (int)strlen(string);
 
 	//WF
 	/*
@@ -250,7 +250,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		{
 			Com_sprintf (entry, sizeof(entry),
 				"xv %i yv %i picn %s ",x+32, y, tag);
-			j = strlen(entry);
+			j = (int)strlen(entry);
 			if (stringlength + j > 1024)
 				break;
 			strlcpy (string + stringlength, entry, sizeof(string)-stringlength);
@@ -264,7 +264,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 //			x, y, sorted[i], cl->resp.score, cl->ping, (level.framenum - cl->resp.enterframe)/600);
 			x, y, k, cl->resp.score, cl->ping, (level.framenum - cl->resp.enterframe)/600);
 //WF
-		j = strlen(entry);
+		j = (int)strlen(entry);
 		if (stringlength + j > 1024)
 			break;
 		strlcpy (string + stringlength, entry, sizeof(string)-stringlength);

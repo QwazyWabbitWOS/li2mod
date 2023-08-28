@@ -1516,7 +1516,7 @@ void CTFScoreboardMessage (edict_t *ent, edict_t *killer)
 {
 	char	entry[1024];
 	char	string[1400];
-	int		len;
+	size_t	len;
 	int		i, j, k, n;
 	int		sorted[2][MAX_CLIENTS];
 	int		sortedscores[2][MAX_CLIENTS];
@@ -2657,7 +2657,7 @@ void Lithium_CTFMenu(edict_t *ent);
 void CTFOpenJoinMenu(edict_t *ent) {
 	Lithium_CTFMenu(ent);
 }
-lvar_t *use_startchasecam;
+extern lvar_t *use_startchasecam;
 //WF
 
 qboolean CTFStartClient(edict_t *ent)

@@ -352,7 +352,7 @@ void News_RunFrame(void) {
 
 	if(level.time > news_check_time) {
 		news = GetNews();
-		if(stricmp(news, oldnews)) {
+		if(Q_strcasecmp(news, oldnews)) {
 			int i;
 			edict_t *ent;
 
@@ -1695,7 +1695,7 @@ void CTFSetIDView(edict_t *ent) {
 	if(best == ent || best == ent->client->chase_target || (best && best->deadflag == DEAD_DEAD))
 		best = NULL;
 
-	if(ent->id_ent != best) {
+	if(ent && ent->id_ent != best) {
 		ent->id_ent = best;
 		if(ent->layout & (LAYOUT_CENTERPRINT | LAYOUT_CHASECAM | LAYOUT_ID))
 			ent->layout_update = true;
@@ -1706,7 +1706,7 @@ void CTFSetIDView(edict_t *ent) {
 // misc
 
 char *file_gamedir(char *name) {
-	char gdir[256];
+	char gdir[MAX_OSPATH];
 
 	if(strchr(name, '/') || strchr(name, '\\'))
 		strlcpy(file_gamedir_buffer, name, sizeof(file_gamedir_buffer));
@@ -1714,7 +1714,7 @@ char *file_gamedir(char *name) {
 		strlcpy(gdir, gi.cvar("gamedir", "", 0)->string, sizeof(gdir));
 		if(!strlen(gdir))
 			strlcpy(gdir, "baseq2", sizeof(gdir));
-		snprintf(file_gamedir_buffer, sizeof(file_gamedir_buffer), "%s/%s", gdir, name);
+		Com_sprintf(file_gamedir_buffer, sizeof(file_gamedir_buffer), "%s/%s", gdir, name);
 	}
 
 	return file_gamedir_buffer;
@@ -1738,7 +1738,7 @@ void String_Crop(char *str) {
 	char *c;
 	int l;
 
-	l = strlen(str)+1;
+	l = (int)strlen(str)+1;
 	c = gi.TagMalloc(l, TAG_GAME);
 	if (!c)
 		return;
@@ -1749,7 +1749,7 @@ void String_Crop(char *str) {
 	strlcpy(str, c, l);
 	gi.TagFree(c);
 
-	c = str + strlen(str) - 1;
+	c = str + (int)strlen(str) - 1;
 	while(c > str && (*c == ' ' || *c == '\t'))
 		c--;
 
@@ -1769,11 +1769,11 @@ int strip(char *str) {
 
 	String_Crop(str);
 
-	return strlen(str);
+	return (int)strlen(str);
 }
 
 void stuffcmd(edict_t *e, char *s) {
-	gi.WriteByte(11);
+	gi.WriteByte(svc_stufftext);
 	gi.WriteString(s);
 	gi.unicast(e, true);
 }
@@ -2077,7 +2077,7 @@ qboolean Lithium_ClientCommand(edict_t *ent) {
 	else if(!Q_stricmp(cmd, "eval")) {
 		lvar_t *lvar = first_lvar;
 		while(lvar) {
-			if(!stricmp(gi.argv(1), lvar->cvar->name)) {
+			if(!Q_strcasecmp(gi.argv(1), lvar->cvar->name)) {
 				gi.cprintf(ent, PRINT_HIGH, "\"%s\" is \"%s\"\n", lvar->cvar->name, lvar->cvar->string);
 				return true;
 			}

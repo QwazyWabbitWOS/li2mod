@@ -35,8 +35,8 @@
 place_t *first_place;
 
 char *Highscores_File(void) {
-	static char buf[64];
-	snprintf(buf, sizeof(buf), "%s/hiscores/%s.%02dm", gi.cvar("gamedir", 0, 0)->string,
+	static char buf[MAX_OSPATH];
+	Com_sprintf(buf, sizeof(buf), "%s/hiscores/%s.%02dm", gi.cvar("gamedir", 0, 0)->string,
 		level.mapname, (int)timelimit->value);
 	return buf;
 }
@@ -104,7 +104,7 @@ void Highscores_Update(void) {
 
 				new_place->score = ent->client->resp.score;
 				strlcpy(new_place->name, ent->client->pers.netname, sizeof(new_place->name));
-				snprintf(new_place->date, sizeof(new_place->date), "%02d/%02d/%04d", tm->tm_mon + 1, tm->tm_mday, 1900 + tm->tm_year);
+				Com_sprintf(new_place->date, sizeof(new_place->date), "%02d/%02d/%04d", tm->tm_mon + 1, tm->tm_mday, 1900 + tm->tm_year);
 
 				new_place->next = place;
 				new_place->prev = place->prev;
@@ -131,7 +131,7 @@ void Highscores_Update(void) {
 
 			new_place->score = ent->client->resp.score;
 			strlcpy(new_place->name, ent->client->pers.netname, sizeof(new_place->name));
-			snprintf(new_place->date, sizeof(new_place->date), "%02d/%02d/%04d", tm->tm_mon + 1, tm->tm_mday, 1900 + tm->tm_year);
+			Com_sprintf(new_place->date, sizeof(new_place->date), "%02d/%02d/%04d", tm->tm_mon + 1, tm->tm_mday, 1900 + tm->tm_year);
 
 			if(!place)
 				first_place = new_place;
@@ -233,5 +233,5 @@ int Highscores_FullScoreboard(edict_t *ent) {
 	gi.WriteByte(svc_layout);
 	gi.WriteString(string);
 
-	return strlen(string);
+	return (int)strlen(string);
 }

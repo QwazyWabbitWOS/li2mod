@@ -53,7 +53,7 @@ typedef enum {false, true}	qboolean;
 #define	MAX_TOKEN_CHARS		128		// max length of an individual token
 
 #define	MAX_QPATH			64		// max length of a quake game pathname
-#define	MAX_OSPATH			128		// max length of a filesystem pathname
+#define	MAX_OSPATH			260		//QW// Windows specifies 260 max length of a filesystem pathname
 
 //
 // per-level limits
@@ -206,6 +206,25 @@ void Com_sprintf (char *dest, int size, char *fmt, ...);
 void Com_PageInMemory (byte *buffer, int size);
 
 //=============================================
+
+// fast "C" macros
+#define Q_isupper(c)    ((c) >= 'A' && (c) <= 'Z')
+#define Q_islower(c)    ((c) >= 'a' && (c) <= 'z')
+#define Q_isdigit(c)    ((c) >= '0' && (c) <= '9')
+#define Q_isalpha(c)    (Q_isupper(c) || Q_islower(c))
+#define Q_isalnum(c)    (Q_isalpha(c) || Q_isdigit(c))
+#define Q_isprint(c)    ((c) >= 32 && (c) < 127)
+#define Q_isgraph(c)    ((c) > 32 && (c) < 127)
+#define Q_isspace(c)    (c == ' ' || c == '\f' || c == '\n' || \
+                         c == '\r' || c == '\t' || c == '\v')
+
+inline int Q_tolower(int c)
+{
+	if (Q_isupper(c)) {
+		c += ('a' - 'A');
+	}
+	return c;
+}
 
 // portable case insensitive compare
 int Q_stricmp (char *s1, char *s2);

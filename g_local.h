@@ -12,6 +12,14 @@
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"baseq2"
 
+#define MOD_VERSION "1.32"
+
+#ifndef _DEBUG
+#define BUILD	"Release"
+#else
+#define BUILD	"Debug"
+#endif
+
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
 #define	svc_muzzleflash2	2
@@ -490,13 +498,14 @@ extern	int	body_armor_index;
 
 extern	int	meansOfDeath;
 
+#define q_offsetof(t, m)	((size_t)&((t *)0)->m)
 
-extern	edict_t			*g_edicts;
+extern	edict_t* g_edicts;
 
-#define	FOFS(x) (uintptr_t)&(((edict_t *)0)->x)
-#define	STOFS(x) (uintptr_t)&(((spawn_temp_t *)0)->x)
-#define	LLOFS(x) (uintptr_t)&(((level_locals_t *)0)->x)
-#define	CLOFS(x) (uintptr_t)&(((gclient_t *)0)->x)
+#define FOFS(x)		q_offsetof(edict_t, x)
+#define STOFS(x)	q_offsetof(spawn_temp_t, x)
+#define	LLOFS(x)	q_offsetof(level_locals_t, x)
+#define	CLOFS(x)	q_offsetof(gclient_t, x)
 
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
@@ -1025,7 +1034,7 @@ struct gclient_s
 typedef struct pvar_s pvar_t;
 typedef struct lclient_s lclient_t;
 #ifndef WIN32
-	#define stricmp strcasecmp
+	#define stricmp Q_strcasecmp
 #endif
 //WF
 

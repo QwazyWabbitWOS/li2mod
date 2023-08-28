@@ -20,6 +20,10 @@
 #endif
 #endif
 
+#ifndef _WIN32
+typedef int        SOCKET;
+#endif
+
 #define DELIM "\x001"
 #define BUF_LEN 512
 #define BUF_OVERFLOW 0
@@ -32,11 +36,11 @@ int Net_Check(void);
 int Net_Lookup(char *host);
 int Net_Connect(int haddr, int port);
 int Net_IsConnect(int sock);
-int Net_Poll(int sock);
+int Net_Poll(SOCKET sock);
 int Net_Send(int sock, char *buf);
 int Net_Sendf(int sock, char *format, ...);
 int Net_Recv(int sock, char *buf, int len);
-int Net_Close(int sock);
+int Net_Close(SOCKET sock);
 char *Net_GetAddrStr(int sock);
 int Net_SendTotal(void);
 int Net_RecvTotal(void);

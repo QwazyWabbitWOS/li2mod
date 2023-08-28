@@ -330,7 +330,7 @@ void Admin_Kick(edict_t *ent) {
 		cl_ent = g_edicts + 1 + i;
 		if(cl_ent->inuse && cl_ent->client) {
 			static char cmd[MAX_CLIENTS][8];
-			snprintf(cmd[i], sizeof(cmd[i]), "_ak %d", i);
+			Com_sprintf(cmd[i], sizeof(cmd[i]), "_ak %d", i);
 			Menu_AddLine(ent, MENU_CMD, 0, cl_ent->client->pers.netname, cmd[i]);
 		}
 	}

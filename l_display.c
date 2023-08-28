@@ -247,7 +247,7 @@ int StatusBar_Update(edict_t *ent) {
 	gi.WriteString(statusbar);
 	gi.unicast(ent, true);
 
-	return strlen(statusbar);
+	return (int)strlen(statusbar);
 }
 
 char *GetMOTD(void) {
@@ -291,7 +291,7 @@ char *GetMOTD(void) {
 //				buf[32] = '\0';
 
 			if(strlen(buf)) {
-				snprintf(add, sizeof(add), "yb %d string \"%s\" ", pos, buf);
+				Com_sprintf(add, sizeof(add), "yb %d string \"%s\" ", pos, buf);
 				strlcat(motdstr, add, sizeof(motdstr));
 			}
  
@@ -362,7 +362,7 @@ char *GetNews(void) {
 		if(c) *c = 0;
 
 		if(strlen(buf)) {
-			snprintf(add, sizeof(add), "yb %d string \"%s\" ", pos, buf);
+			Com_sprintf(add, sizeof(add), "yb %d string \"%s\" ", pos, buf);
 			strlcat(newsstr, add, sizeof(newsstr));
 		}
  
@@ -486,7 +486,7 @@ int Layout_Update(edict_t *ent) {
 	gi.WriteString(string);
 	gi.unicast(ent, true);
 
-	return strlen(string);
+	return (int)strlen(string);
 }
 
 char ad[5][64] = { 
@@ -543,7 +543,7 @@ int Lithium_Scoreboard(edict_t *ent, edict_t *killer) {
 	// print level name and exit rules
 	string[0] = 0;
 
-	stringlength = strlen(string);
+	stringlength = (int)strlen(string);
 
 	if(use_highscores->value)
 		Highscores_Scoreboard(string, sizeof(string), &down);
@@ -598,5 +598,5 @@ int Lithium_Scoreboard(edict_t *ent, edict_t *killer) {
 	gi.WriteByte(svc_layout);
 	gi.WriteString(string);
 
-	return strlen(string);
+	return (int)strlen(string);
 }
