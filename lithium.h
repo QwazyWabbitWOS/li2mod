@@ -426,7 +426,7 @@ extern lvar_t *use_chatkick;
 extern lvar_t *use_vwep;
 extern lvar_t *use_packs;
 extern lvar_t *use_highscores;
-
+extern lvar_t* use_startchasecam;
 
 // weapon vars
 extern lvar_t *blaster_damage;
@@ -517,7 +517,6 @@ extern lvar_t *first_lvar;
 
 extern lvar_t *debug;
 extern FILE *debug_file;
-void Debug(char *fmt, ...);
 
 char *Lithium_GetAd(int down);
 void Lithium_SetAd(int num, char *ad);

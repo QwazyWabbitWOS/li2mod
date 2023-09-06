@@ -99,6 +99,9 @@ gitem_t	*FindItem (char *pickup_name)
 
 void DoRespawn (edict_t *ent)
 {
+	if (!ent)
+		return;
+
 	if (ent->team)
 	{
 		edict_t	*master;
@@ -114,30 +117,34 @@ void DoRespawn (edict_t *ent)
 			((int)dmflags->value & DF_WEAPONS_STAY) &&
 			master->item && (master->item->flags & IT_WEAPON))
 			ent = master;
-		else {
-//ZOID
-			for (count = 0, ent = master; ent; ent = ent->chain, count++)
-				;
+		else //QW//
+		{
+			count = 0;
+			for (ent = master; ent; ent = ent->chain)
+				count++;
 
-			choice = rand() % count;
+			choice = count ? rand() % count : 0;
 
-			for (count = 0, ent = master; count < choice; ent = ent->chain, count++)
-				;
-		}
+			count = 0;
+			for (ent = master; count < choice; ent = ent->chain)
+				count++;
+		} //QW//
 	}
 
-	ent->svflags &= ~SVF_NOCLIENT;
-	ent->solid = SOLID_TRIGGER;
-	gi.linkentity (ent);
+	if (ent) //QW//
+	{
+		ent->svflags &= ~SVF_NOCLIENT;
+		ent->solid = SOLID_TRIGGER;
+		gi.linkentity(ent);
 
-	// send an effect
-	ent->s.event = EV_ITEM_RESPAWN;
+		// send an effect
+		ent->s.event = EV_ITEM_RESPAWN;
 
-	//WF
-//	Rune_MaybeSpawn(ent->s.origin);
-	Pack_MaybeSpawn(ent->s.origin);
-	//WF
-
+		//WF
+		//Rune_MaybeSpawn(ent->s.origin);
+		Pack_MaybeSpawn(ent->s.origin);
+		//WF
+	}
 }
 
 void SetRespawn (edict_t *ent, float delay)
@@ -1086,7 +1093,7 @@ void PrecacheItem (gitem_t *it)
 		if (len >= MAX_QPATH || len < 5)
 			gi.error ("PrecacheItem: %s has bad precache string", it->classname);
 		memcpy (data, start, len);
-		data[len] = 0;
+		data[len - 1] = 0;
 		if (*s)
 			s++;
 

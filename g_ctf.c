@@ -54,19 +54,6 @@ static char *tnames[] = {
 	NULL
 };
 
-void stuffcmd(edict_t *ent, char *s)
-//WF
-;
-/*
-//WF
-{
-   	gi.WriteByte (11);	        
-	gi.WriteString (s);
-    gi.unicast (ent, true);	
-}
-//WF
-*/
-//WF
 
 /*--------------------------------------------------------------------------*/
 
@@ -302,7 +289,7 @@ void CTFAssignTeam(gclient_t *who)
 			team2count++;
 		}
 	}
-	if (team1count < team1count)
+	if (team1count < team2count)
 		who->resp.ctf_team = CTF_TEAM1;
 	else if (team2count < team1count)
 		who->resp.ctf_team = CTF_TEAM2;
@@ -406,7 +393,8 @@ void CTFFragBonuses(edict_t *targ, edict_t *inflictor, edict_t *attacker)
 	edict_t *ent;
 	gitem_t *flag_item, *enemy_flag_item;
 	int otherteam;
-	edict_t *flag, *carrier;
+	edict_t* flag;
+	edict_t* carrier;
 	char *c;
 	vec3_t v1, v2;
 
@@ -2657,7 +2645,6 @@ void Lithium_CTFMenu(edict_t *ent);
 void CTFOpenJoinMenu(edict_t *ent) {
 	Lithium_CTFMenu(ent);
 }
-extern lvar_t *use_startchasecam;
 //WF
 
 qboolean CTFStartClient(edict_t *ent)

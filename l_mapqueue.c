@@ -130,7 +130,7 @@ void Mapqueue_SplitLine(char *buf, char *map, char *desc, char *start, char *end
 }
 
 char *Mapqueue_GetMapName(void) {
-	static char map[MAX_MAPNAME];
+	static char map[MAX_MAPNAME] = "";
 	static char lastmapqueue[MAX_MAPNAME] = "";
 	static char lastmap[MAX_MAPNAME] = "";
 	static int maps = 0;

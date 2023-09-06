@@ -157,9 +157,9 @@ void Highscores_Update(void) {
 		return;
 
 #ifdef WIN32
-	_mkdir(file_gamedir("hiscores"));
+	int stat = _mkdir(file_gamedir("hiscores"));
 #else
-	mkdir(file_gamedir("hiscores"), S_IRWXU | S_IRWXG | S_IRWXO);
+	int stat = mkdir(file_gamedir("hiscores"), S_IRWXU | S_IRWXG | S_IRWXO);
 #endif
 	file = fopen(Highscores_File(), "wt");
 	if(!file)

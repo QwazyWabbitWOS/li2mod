@@ -27,9 +27,16 @@
 lvar_t *first_lvar = NULL, *last_lvar = NULL;
 
 lvar_t *lvar(char *name, char *string, char *edit, int cat) {
+	
 	lvar_t *lvar = (lvar_t *)malloc(sizeof(lvar_t));
+	if (!lvar)
+	{
+		gi.error("malloc failed in lvar()\n");
+		abort();
+	}
+	
 	cvar_t *cvar = gi.cvar(name, string, 0);
-
+	
 	lvar->cvar = cvar;
 	lvar->string = cvar->string;
 	lvar->value = cvar->value;

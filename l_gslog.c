@@ -61,7 +61,7 @@ void GSLog_InitGame(void) {
 
 #include "time.h"
 
-char *monthname[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+char *monthname[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 void GSLog_InitLevel(void) {
@@ -78,7 +78,7 @@ void GSLog_InitLevel(void) {
 
 	time(&t);
 	tm = localtime(&t);
-	GSLog("\t\tLogDate\t%d %s %04d", tm->tm_mday, monthname[MIN(MAX(tm->tm_mon, 0), 12)], 1900 + tm->tm_year);
+	GSLog("\t\tLogDate\t%d %s %04d", tm->tm_mday, monthname[MIN(MAX(tm->tm_mon, 0), 11)], 1900 + tm->tm_year);
 	GSLog("\t\tLogTime\t%02d:%02d:%02d", tm->tm_hour, tm->tm_min, tm->tm_sec);
 
 	GSLog("\t\tLogDeathFlags\t%d", (int)dmflags->value);

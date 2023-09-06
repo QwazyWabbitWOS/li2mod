@@ -112,7 +112,7 @@ qboolean SV_FilterPacket (char *from)
 	{
 		byte	b[4];
 		unsigned int	i;
-	} m;
+	} m = { 0 };
 	char *p;
 
 	i = 0;
