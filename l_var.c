@@ -64,12 +64,12 @@ extern lvar_t *use_runes, *use_hook, *use_nocamp, *use_mapvote, *use_highscores,
 void Var_SetFeatures(void) {
 	char features[256] = "";
 	
-	if(use_runes->value) strlcat(features, "Runes, ", sizeof(features));
-	if(use_hook->value) strlcat(features, "Hook, ", sizeof(features));
-	if(use_nocamp->value) strlcat(features, "NoCamp, ", sizeof(features));
-	if(use_mapvote->value) strlcat(features, "MapVote, ", sizeof(features));
-	if(use_highscores->value) strlcat(features, "HiScores, ", sizeof(features));
-	if(use_zbotkick->value) strlcat(features, "ZbotKick, ", sizeof(features));
+	if(use_runes->value) Q_strncatz(features, "Runes, ", sizeof(features));
+	if(use_hook->value) Q_strncatz(features, "Hook, ", sizeof(features));
+	if(use_nocamp->value) Q_strncatz(features, "NoCamp, ", sizeof(features));
+	if(use_mapvote->value) Q_strncatz(features, "MapVote, ", sizeof(features));
+	if(use_highscores->value) Q_strncatz(features, "HiScores, ", sizeof(features));
+	if(use_zbotkick->value) Q_strncatz(features, "ZbotKick, ", sizeof(features));
 
 	if(strlen(features))
 		features[strlen(features) - 2] = 0;

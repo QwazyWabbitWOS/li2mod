@@ -173,7 +173,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 //	int		sortedscores[MAX_CLIENTS];
 //	int		score, total;
 	//WF
-	int		picnum;
+	//int		picnum;
 	int		x, y;
 	gclient_t	*cl;
 	edict_t		*cl_ent;
@@ -235,7 +235,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		k = cl_ent - g_edicts - 1;
 	//WF
 
-		picnum = gi.imageindex ("i_fixme");
+		//picnum = gi.imageindex ("i_fixme");
 		x = (i>=6) ? 160 : 0;
 		y = 32 + 32 * (i%6);
 
@@ -253,7 +253,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 			j = (int)strlen(entry);
 			if (stringlength + j > 1024)
 				break;
-			strlcpy (string + stringlength, entry, sizeof(string)-stringlength);
+			Q_strncpyz (string + stringlength, entry, sizeof(string)-stringlength);
 			stringlength += j;
 		}
 
@@ -267,7 +267,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		j = (int)strlen(entry);
 		if (stringlength + j > 1024)
 			break;
-		strlcpy (string + stringlength, entry, sizeof(string)-stringlength);
+		Q_strncpyz (string + stringlength, entry, sizeof(string)-stringlength);
 		stringlength += j;
 	}
 
@@ -346,7 +346,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 			j = strlen(entry);
 			if (stringlength + j > 1024)
 				break;
-			strlcpy (string + stringlength, entry, sizeof(string)-stringlength);
+			Q_strncpyz (string + stringlength, entry, sizeof(string)-stringlength);
 			stringlength += j;
 		}
 
@@ -357,7 +357,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		j = strlen(entry);
 		if (stringlength + j > 1024)
 			break;
-		strlcpy (string + stringlength, entry, sizeof(string)-stringlength);
+		Q_strncpyz (string + stringlength, entry, sizeof(string)-stringlength);
 		stringlength += j;
 	}
 
@@ -504,7 +504,8 @@ G_SetStats
 void G_SetStats (edict_t *ent)
 {
 	gitem_t		*item;
-	int			index, cells;
+	int			index;
+	int			cells = 0;
 	int			power_armor_type;
 
 	//
@@ -684,7 +685,7 @@ G_SetSpectatorStats
 */
 void G_SetSpectatorStats (edict_t *ent)
 {
-	gclient_t *cl = ent->client;
+	//gclient_t *cl = ent->client;
 
 	//WF
 //	if (!cl->chase_target)
@@ -695,19 +696,20 @@ void G_SetSpectatorStats (edict_t *ent)
 	return;
 	//WF
 
-	cl->ps.stats[STAT_SPECTATOR] = 1;
+	//QW// unreachable code
+	//cl->ps.stats[STAT_SPECTATOR] = 1;
 
-	// layouts are independant in spectator
-	cl->ps.stats[STAT_LAYOUTS] = 0;
-	if (cl->pers.health <= 0 || level.intermissiontime || cl->showscores)
-		cl->ps.stats[STAT_LAYOUTS] |= 1;
-	if (cl->showinventory && cl->pers.health > 0)
-		cl->ps.stats[STAT_LAYOUTS] |= 2;
+	//// layouts are independant in spectator
+	//cl->ps.stats[STAT_LAYOUTS] = 0;
+	//if (cl->pers.health <= 0 || level.intermissiontime || cl->showscores)
+	//	cl->ps.stats[STAT_LAYOUTS] |= 1;
+	//if (cl->showinventory && cl->pers.health > 0)
+	//	cl->ps.stats[STAT_LAYOUTS] |= 2;
 
-	if (cl->chase_target && cl->chase_target->inuse)
-		cl->ps.stats[STAT_CHASE] = CS_PLAYERSKINS + 
-			(cl->chase_target - g_edicts) - 1;
-	else
-		cl->ps.stats[STAT_CHASE] = 0;
+	//if (cl->chase_target && cl->chase_target->inuse)
+	//	cl->ps.stats[STAT_CHASE] = CS_PLAYERSKINS + 
+	//		(cl->chase_target - g_edicts) - 1;
+	//else
+	//	cl->ps.stats[STAT_CHASE] = 0;
 }
 

@@ -84,7 +84,7 @@ static edict_t *loc_findradius (edict_t *from, vec3_t org, float rad)
 			continue;
 #endif
 		for (j=0 ; j<3 ; j++)
-			eorg[j] = org[j] - (from->s.origin[j] + (from->mins[j] + from->maxs[j])*0.5);
+			eorg[j] = org[j] - (from->s.origin[j] + (from->mins[j] + from->maxs[j])*0.5f);
 		if (VectorLength(eorg) > rad)
 			continue;
 		return from;
@@ -243,7 +243,7 @@ void CTFAssignSkin(edict_t *ent, char *s)
 	if ((p = strrchr(t, '/')) != NULL)
 		p[1] = 0;
 	else
-		strlcpy(t, "male/", sizeof(t));
+		Q_strncpyz(t, "male/", sizeof(t));
 
 	switch (ent->client->resp.ctf_team) {
 	case CTF_TEAM1:
@@ -394,7 +394,7 @@ void CTFFragBonuses(edict_t *targ, edict_t *inflictor, edict_t *attacker)
 	gitem_t *flag_item, *enemy_flag_item;
 	int otherteam;
 	edict_t* flag;
-	edict_t* carrier;
+	edict_t* carrier = NULL;
 	char *c;
 	vec3_t v1, v2;
 
@@ -737,7 +737,7 @@ static void CTFDropFlagTouch(edict_t *ent, edict_t *other, cplane_t *plane, csur
 
 static void CTFDropFlagThink(edict_t *ent)
 {
-	qboolean returned;
+	qboolean returned = false;
 
 	// auto return the flag
 	// reset flag will remove ourselves
@@ -978,7 +978,6 @@ void SetCTFStats(edict_t *ent, short *stats)
 	e = G_Find(NULL, FOFS(classname), "item_flag_team1");
 	if (e != NULL) {
 		if (e->solid == SOLID_NOT) {
-			int i;
 
 			// not at base
 			// check if on player
@@ -997,7 +996,6 @@ void SetCTFStats(edict_t *ent, short *stats)
 	e = G_Find(NULL, FOFS(classname), "item_flag_team2");
 	if (e != NULL) {
 		if (e->solid == SOLID_NOT) {
-			int i;
 
 			// not at base
 			// check if on player
@@ -1096,7 +1094,7 @@ void CTFResetGrapple(edict_t *self)
 		gclient_t *cl;
 
 		if (self->owner->client->silencer_shots)
-			volume = 0.2;
+			volume = 0.2f;
 
 		gi.sound (self->owner, CHAN_RELIABLE+CHAN_WEAPON, gi.soundindex("weapons/grapple/grreset.wav"), volume, ATTN_NORM, 0);
 		cl = self->owner->client;
@@ -1140,7 +1138,7 @@ void CTFGrappleTouch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t
 	self->solid = SOLID_NOT;
 
 	if (self->owner->client->silencer_shots)
-		volume = 0.2;
+		volume = 0.2f;
 
 	gi.sound (self->owner, CHAN_RELIABLE+CHAN_WEAPON, gi.soundindex("weapons/grapple/grpull.wav"), volume, ATTN_NORM, 0);
 	gi.sound (self, CHAN_WEAPON, gi.soundindex("weapons/grapple/grhit.wav"), volume, ATTN_NORM, 0);
@@ -1250,7 +1248,7 @@ void CTFGrapplePull(edict_t *self)
 			float volume = 1.0;
 
 			if (self->owner->client->silencer_shots)
-				volume = 0.2;
+				volume = 0.2f;
 
 			T_Damage (self->enemy, self, self->owner, self->velocity, self->s.origin, vec3_origin, 1, 1, 0, MOD_GRAPPLE);
 			gi.sound (self, CHAN_WEAPON, gi.soundindex("weapons/grapple/grhurt.wav"), volume, ATTN_NORM, 0);
@@ -1283,7 +1281,7 @@ void CTFGrapplePull(edict_t *self)
 			float volume = 1.0;
 
 			if (self->owner->client->silencer_shots)
-				volume = 0.2;
+				volume = 0.2f;
 
 			self->owner->client->ps.pmove.pm_flags |= PMF_NO_PREDICTION;
 			gi.sound (self->owner, CHAN_RELIABLE+CHAN_WEAPON, gi.soundindex("weapons/grapple/grhang.wav"), volume, ATTN_NORM, 0);
@@ -1354,7 +1352,7 @@ void CTFGrappleFire (edict_t *ent, vec3_t g_offset, int damage, int effect)
 	ent->client->kick_angles[0] = -1;
 
 	if (ent->client->silencer_shots)
-		volume = 0.2;
+		volume = 0.2f;
 
 	gi.sound (ent, CHAN_RELIABLE+CHAN_WEAPON, gi.soundindex("weapons/grapple/grfire.wav"), volume, ATTN_NORM, 0);
 	CTFFireGrapple (ent, start, forward, damage, CTF_GRAPPLE_SPEED, effect);
@@ -1579,7 +1577,7 @@ void CTFScoreboardMessage (edict_t *ent, edict_t *killer)
 		// set up y
 		snprintf(entry, sizeof(entry), "yv %d ", 42 + i * 8);
 		if (maxsize - len > strlen(entry)) {
-			strlcat(string, entry, sizeof(string));
+			Q_strncatz(string, entry, sizeof(string));
 			len = strlen(string);
 		}
 #else
@@ -1600,7 +1598,7 @@ void CTFScoreboardMessage (edict_t *ent, edict_t *killer)
 			cl->pers.netname);
 
 			if (cl_ent->client->pers.inventory[ITEM_INDEX(flag2_item)])
-				strlcat(entry, "xv 56 picn sbfctf2 ", sizeof(entry));
+				Q_strncatz(entry, "xv 56 picn sbfctf2 ", sizeof(entry));
 #else
 			snprintf(entry+strlen(entry), sizeof(entry)-strlen(entry),
 				"ctf 0 %d %d %d %d ",
@@ -1615,7 +1613,7 @@ void CTFScoreboardMessage (edict_t *ent, edict_t *killer)
 #endif
 
 			if (maxsize - len > strlen(entry)) {
-				strlcat(string, entry, sizeof(string));
+				Q_strncatz(string, entry, sizeof(string));
 				len = strlen(string);
 				last[0] = i;
 			}
@@ -1635,7 +1633,7 @@ void CTFScoreboardMessage (edict_t *ent, edict_t *killer)
 			cl->pers.netname);
 
 			if (cl_ent->client->pers.inventory[ITEM_INDEX(flag1_item)])
-				strlcat(entry, "xv 216 picn sbfctf1 ", sizeof(entry));
+				Q_strncatz(entry, "xv 216 picn sbfctf1 ", sizeof(entry));
 
 #else
 
@@ -1651,7 +1649,7 @@ void CTFScoreboardMessage (edict_t *ent, edict_t *killer)
 					42 + i * 8);
 #endif
 			if (maxsize - len > strlen(entry)) {
-				strlcat(string, entry, sizeof(string));
+				Q_strncatz(string, entry, sizeof(string));
 				len = strlen(string);
 				last[1] = i;
 			}
@@ -1681,7 +1679,7 @@ void CTFScoreboardMessage (edict_t *ent, edict_t *killer)
 			if (!k) {
 				k = 1;
 				snprintf(entry, sizeof(entry), "xv 0 yv %d string2 \"Spectators\" ", j);
-				strlcat(string, entry, sizeof(string));
+				Q_strncatz(string, entry, sizeof(string));
 				len = strlen(string);
 				j += 8;
 			}
@@ -1694,7 +1692,7 @@ void CTFScoreboardMessage (edict_t *ent, edict_t *killer)
 				cl->resp.score,
 				cl->ping > 999 ? 999 : cl->ping);
 			if (maxsize - len > strlen(entry)) {
-				strlcat(string, entry, sizeof(string));
+				Q_strncatz(string, entry, sizeof(string));
 				len = strlen(string);
 			}
 			
@@ -1712,11 +1710,11 @@ void CTFScoreboardMessage (edict_t *ent, edict_t *killer)
 			42 + (last[1]+1)*8, total[1] - last[1] - 1);
 
 	if(level.intermissiontime) {
-		strlcat(string, Lithium_GetAd(j + 24), sizeof(string));
+		Q_strncatz(string, Lithium_GetAd(j + 24), sizeof(string));
 	} else {
 		int sec = (int)(timelimit->value * 60 + empty_time - level.time);
-		strlcat(string, va("xv 0 yv -8 cstring \"Time left is %d:%02d\" ", sec / 60, sec % 60), sizeof(string));
-		strlcat(string, va("xv 0 yv %d cstring \"Press 0 for Lithium II menu\" ", j + 24), sizeof(string));
+		Q_strncatz(string, va("xv 0 yv -8 cstring \"Time left is %d:%02d\" ", sec / 60, sec % 60), sizeof(string));
+		Q_strncatz(string, va("xv 0 yv %d cstring \"Press 0 for Lithium II menu\" ", j + 24), sizeof(string));
 	}
 
 	gi.WriteByte (svc_layout);
@@ -1918,7 +1916,7 @@ int CTFApplyResistance(edict_t *ent, int dmg)
 	float volume = 1.0;
 
 	if (ent->client && ent->client->silencer_shots)
-		volume = 0.2;
+		volume = 0.2f;
 
 	if (!tech)
 		tech = FindItemByClassname("item_tech1");
@@ -1948,7 +1946,7 @@ qboolean CTFApplyStrengthSound(edict_t *ent)
 	float volume = 1.0;
 
 	if (ent->client && ent->client->silencer_shots)
-		volume = 0.2;
+		volume = 0.2f;
 
 	if (!tech)
 		tech = FindItemByClassname("item_tech2");
@@ -1985,7 +1983,7 @@ void CTFApplyHasteSound(edict_t *ent)
 	float volume = 1.0;
 
 	if (ent->client && ent->client->silencer_shots)
-		volume = 0.2;
+		volume = 0.2f;
 
 	if (!tech)
 		tech = FindItemByClassname("item_tech3");
@@ -2010,7 +2008,7 @@ void CTFApplyRegeneration(edict_t *ent)
 		return;
 
 	if (ent->client->silencer_shots)
-		volume = 0.2;
+		volume = 0.2f;
 
 	if (!tech)
 		tech = FindItemByClassname("item_tech4");
@@ -2143,7 +2141,7 @@ static void CTFSay_Team_Location(edict_t *who, char *buf, unsigned int buflen)
 	}
 
 	if (!hot) {
-		strlcpy(buf, "nowhere", buflen);
+		Q_strncpyz(buf, "nowhere", buflen);
 		return;
 	}
 
@@ -2171,13 +2169,13 @@ static void CTFSay_Team_Location(edict_t *who, char *buf, unsigned int buflen)
 	}
 
 	if ((item = FindItemByClassname(hot->classname)) == NULL) {
-		strlcpy(buf, "nowhere", buflen);
+		Q_strncpyz(buf, "nowhere", buflen);
 		return;
 	}
 
 	// in water?
 	if (who->waterlevel)
-		strlcpy(buf, "in the water ", buflen);
+		Q_strncpyz(buf, "in the water ", buflen);
 	else
 		*buf = 0;
 
@@ -2185,20 +2183,20 @@ static void CTFSay_Team_Location(edict_t *who, char *buf, unsigned int buflen)
 	VectorSubtract(who->s.origin, hot->s.origin, v);
 	if (fabs(v[2]) > fabs(v[0]) && fabs(v[2]) > fabs(v[1]))
 		if (v[2] > 0)
-			strlcat(buf, "above ", buflen);
+			Q_strncatz(buf, "above ", buflen);
 		else
-			strlcat(buf, "below ", buflen);
+			Q_strncatz(buf, "below ", buflen);
 	else
-		strlcat(buf, "near ", buflen);
+		Q_strncatz(buf, "near ", buflen);
 
 	if (nearteam == CTF_TEAM1)
-		strlcat(buf, "the red ", buflen);
+		Q_strncatz(buf, "the red ", buflen);
 	else if (nearteam == CTF_TEAM2)
-		strlcat(buf, "the blue ", buflen);
+		Q_strncatz(buf, "the blue ", buflen);
 	else
-		strlcat(buf, "the ", buflen);
+		Q_strncatz(buf, "the ", buflen);
 
-	strlcat(buf, item->pickup_name, buflen);
+	Q_strncatz(buf, item->pickup_name, buflen);
 }
 
 static void CTFSay_Team_Armor(edict_t *who, char *buf, unsigned int buflen)
@@ -2225,20 +2223,20 @@ static void CTFSay_Team_Armor(edict_t *who, char *buf, unsigned int buflen)
 		item = GetItemByIndex (index);
 		if (item) {
 			if (*buf)
-				strlcat(buf, "and ", buflen);
+				Q_strncatz(buf, "and ", buflen);
 			snprintf(buf+strlen(buf), buflen-strlen(buf), "%i units of %s",
 				who->client->pers.inventory[index], item->pickup_name);
 		}
 	}
 
 	if (!*buf)
-		strlcpy(buf, "no armor", buflen);
+		Q_strncpyz(buf, "no armor", buflen);
 }
 
 static void CTFSay_Team_Health(edict_t *who, char *buf, unsigned int buflen)
 {
 	if (who->health <= 0)
-		strlcpy(buf, "dead", buflen);
+		Q_strncpyz(buf, "dead", buflen);
 	else
 		snprintf(buf, buflen-strlen(buf), "%i health", who->health);
 }
@@ -2258,15 +2256,15 @@ static void CTFSay_Team_Tech(edict_t *who, char *buf, unsigned int buflen)
 		}
 		i++;
 	}
-	strlcpy(buf, "no powerup", buflen);
+	Q_strncpyz(buf, "no powerup", buflen);
 }
 
 static void CTFSay_Team_Weapon(edict_t *who, char *buf, unsigned int buflen)
 {
 	if (who->client->pers.weapon)
-		strlcpy(buf, who->client->pers.weapon->pickup_name, buflen);
+		Q_strncpyz(buf, who->client->pers.weapon->pickup_name, buflen);
 	else
-		strlcpy(buf, "none", buflen);
+		Q_strncpyz(buf, "none", buflen);
 }
 
 static void CTFSay_Team_Sight(edict_t *who, char *buf, unsigned int buflen)
@@ -2287,23 +2285,23 @@ static void CTFSay_Team_Sight(edict_t *who, char *buf, unsigned int buflen)
 		if (*s2) {
 			if (strlen(s) + strlen(s2) + 3 < sizeof(s)) {
 				if (n)
-					strlcat(s, ", ", sizeof(s));
-				strlcat(s, s2, sizeof(s));
+					Q_strncatz(s, ", ", sizeof(s));
+				Q_strncatz(s, s2, sizeof(s));
 				*s2 = 0;
 			}
 			n++;
 		}
-		strlcpy(s2, targ->client->pers.netname, sizeof(s2));
+		Q_strncpyz(s2, targ->client->pers.netname, sizeof(s2));
 	}
 	if (*s2) {
 		if (strlen(s) + strlen(s2) + 6 < sizeof(s)) {
 			if (n)
-				strlcat(s, " and ", sizeof(s));
-			strlcat(s, s2, sizeof(s));
+				Q_strncatz(s, " and ", sizeof(s));
+			Q_strncatz(s, s2, sizeof(s));
 		}
-		strlcpy(buf, s, buflen);
+		Q_strncpyz(buf, s, buflen);
 	} else
-		strlcpy(buf, "no one", buflen);
+		Q_strncpyz(buf, "no one", buflen);
 }
 
 //WF
@@ -2372,7 +2370,7 @@ void CTFSay_Team(edict_t *who, char *msg)
 			}
 
 			if(p - outmsg + strlen(buf) < sizeof(outmsg) - 1) {
-				strlcpy(p, buf, sizeof(outmsg) - (p - outmsg));
+				Q_strncpyz(p, buf, sizeof(outmsg) - (p - outmsg));
 				p += strlen(buf);
 			}
 			else
@@ -2570,10 +2568,10 @@ int CTFUpdateJoinMenu(edict_t *ent)
 	joinmenu[6].SelectFunc = CTFJoinTeam2;
 
 	if (ctf_forcejoin->string && *ctf_forcejoin->string) {
-		if (stricmp(ctf_forcejoin->string, "red") == 0) {
+		if (Q_stricmp(ctf_forcejoin->string, "red") == 0) {
 			joinmenu[6].text = NULL;
 			joinmenu[6].SelectFunc = NULL;
-		} else if (stricmp(ctf_forcejoin->string, "blue") == 0) {
+		} else if (Q_stricmp(ctf_forcejoin->string, "blue") == 0) {
 			joinmenu[4].text = NULL;
 			joinmenu[4].SelectFunc = NULL;
 		}
@@ -2586,9 +2584,9 @@ int CTFUpdateJoinMenu(edict_t *ent)
 
 	levelname[0] = '*';
 	if (g_edicts[0].message)
-		strlcpy(levelname+1, g_edicts[0].message, sizeof(levelname) - 1);
+		Q_strncpyz(levelname+1, g_edicts[0].message, sizeof(levelname) - 1);
 	else
-		strlcpy(levelname+1, level.mapname, sizeof(levelname) - 1);
+		Q_strncpyz(levelname+1, level.mapname, sizeof(levelname) - 1);
 	levelname[sizeof(levelname) - 1] = 0;
 
 	num1 = num2 = 0;

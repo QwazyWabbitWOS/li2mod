@@ -24,7 +24,7 @@
 
 #include "g_local.h"
 
-float lithium_ver = 1.32;
+float lithium_ver = 1.32f;
 int lithium_beta = 2;
 
 char lithium_version[16];
@@ -72,7 +72,7 @@ lvar_t *ofp_minping;
 lvar_t *ofp_maxping;
 
 lvar_t *motd;
-lvar_t *news;
+lvar_t *news_file;
 lvar_t *news_time;
 lvar_t *banlist;
 
@@ -89,10 +89,11 @@ float qver;
 void Lithium_InitGame(void) {
 
 	if(!lithium_beta)
-		snprintf(lithium_version, sizeof(lithium_version), "%1.2f", lithium_ver);
+		Com_sprintf(lithium_version, sizeof(lithium_version), "%1.2f", lithium_ver);
 	else
-		snprintf(lithium_version, sizeof(lithium_version), "%1.2f-beta%d", lithium_ver, lithium_beta);
-	snprintf(lithium_modname, sizeof(lithium_modname), "Lithium II Mod v%s", lithium_version);
+		Com_sprintf(lithium_version, sizeof(lithium_version), "%1.2f-beta%d", lithium_ver, lithium_beta);
+
+	Com_sprintf(lithium_modname, sizeof(lithium_modname), "Lithium II Mod v%s", lithium_version);
 
 	sscanf(gi.cvar("version", 0, 0)->string, "%f", &qver);
 
@@ -150,7 +151,7 @@ void Lithium_InitGame(void) {
 	max_rate = lvar("max_rate", "8000", "#####", VAR_OTHER);
 
 	motd = lvar("motd", "motd.txt", "str", VAR_NONE);
-	news = lvar("news", "news.txt", "str", VAR_NONE);
+	news_file = lvar("news", "news.txt", "str", VAR_NONE);
 	news_time = lvar("news_time", "10", "str", VAR_NONE);
 	banlist = lvar("banlist", "admin.lst", "str", VAR_NONE);
 
@@ -163,7 +164,7 @@ void Lithium_InitGame(void) {
 	Hook_InitGame();
 	Vote_InitGame();
 
-//	LNet_InitGame();
+//	LNet_InitGame();	//QW// For Lithium.com master servers
 
 	// must be last for features var
 	Var_InitGame();
@@ -185,7 +186,7 @@ float end_time = 0;
 char *colorize(char *str) {
 	static char ret[128];
 	char *c = ret;
-	strlcpy(ret, str, sizeof(ret));
+	Q_strncpyz(ret, str, sizeof(ret));
 	while(*c)
 		*c++ += 128;
 	return ret;
@@ -208,7 +209,7 @@ void Lithium_InitLevel(void) {
 
 	if(use_highscores->value) {
 		if(ctf->value) {
-			gi.dprintf("Setting use_highscores 0 (ctf is on).\n");
+			gi.dprintf("Setting use_highscores 0 (because ctf is on).\n");
 			gi.cvar_set("use_highscores", "0");
 		}
 		else {
@@ -364,7 +365,7 @@ void News_RunFrame(void) {
 				ent->news_time = level.time + news_time->value;
 			}
 
-			strlcpy(oldnews, news, sizeof(oldnews));
+			Q_strncpyz(oldnews, news, sizeof(oldnews));
 		}
 		news_check_time = level.time + 30;
 	}
@@ -396,7 +397,7 @@ void IP_Scan(char *ipstr, int ip[4]) {
 	char *c, buf[64];
 	int scan;
 
-	strlcpy(buf, ipstr, sizeof(buf));
+	Q_strncpyz(buf, ipstr, sizeof(buf));
 	buf[sizeof(buf) - 1] = 0;
 
 	// turn *'s into -1's
@@ -605,7 +606,7 @@ void Lithium_ClientBegin(edict_t *ent) {
 		ent->lclient->chan_id = 0;
 
 	info = Info_ValueForKey(ent->client->pers.userinfo, "channel");
-	strlcpy(ent->lclient->chan, info, sizeof(ent->lclient->chan));
+	Q_strncpyz(ent->lclient->chan, info, sizeof(ent->lclient->chan));
 	ent->lclient->chan[sizeof(ent->lclient->chan) - 1] = 0;
 
 	if(ent->id_state)
@@ -799,7 +800,7 @@ void ZbotHandle(edict_t *ent) {
 			time_t t;
 			char buf[32];
 			time(&t);
-			strlcpy(buf, ctime(&t), sizeof(buf));
+			Q_strncpyz(buf, ctime(&t), sizeof(buf));
 			fprintf(file, "[%s] %s (%d.%d.%d.%d:%d)\n", buf, ent->client->pers.netname, 
 				ent->lclient->ip[0], ent->lclient->ip[1], ent->lclient->ip[2], ent->lclient->ip[3], ent->lclient->port);
 			fclose(file);
@@ -1069,7 +1070,7 @@ void Lithium_ClientEndFrame(edict_t *ent) {
 
 	if(level.framenum - ent->update_frame > ofp_maxframes->value ||
 			(level.framenum - ent->update_frame) * 500000 /
-			(int)(ofp_base->value + (float)countplayers() * ofp_perplayer->value) + 1 >
+			(ofp_base->value + countplayers() * (int)ofp_perplayer->value) + 1 >
 			(ent->update_size + ent->update_other) * 
 			MIN(MAX(ent->lclient->ping, ofp_minping->value), ofp_maxping->value)) {
 		ent->update_size = StatusBar_Update(ent);
@@ -1082,7 +1083,7 @@ void Lithium_ClientEndFrame(edict_t *ent) {
 	// client has hit ESC key
 	if(ent->layout && !ent->client->showscores) {
 		if(ent->layout & LAYOUT_MENU && ent->menu->editing) {
-			strlcpy(ent->menu->edit, "  ", sizeof(ent->menu->edit));
+			Q_strncpyz(ent->menu->edit, "  ", sizeof(ent->menu->edit));
 			Menu_EditEnd(ent);
 			ent->client->showscores = true;
 			return;
@@ -1230,7 +1231,7 @@ void Lithium_NoAmmoWeaponChange(edict_t *ent) {
 	if(!strlen(weaporder))
 		weaporder = deforder;
 
-	for(i = 0; i < strlen(weaporder); i++) {
+	for(i = 0; i < (int)strlen(weaporder); i++) {
 		j = weaporder[i] - '0' - 1;
 		if(j < 0 || j > 8)
 			continue;
@@ -1462,16 +1463,17 @@ void ChaseSet(edict_t *self, edict_t *ent) {
 qboolean ChaseFind(edict_t *ent, int place, int searchdir) {
 	int i;
 	edict_t *e;
-	int players = countplayers();
 	int start;
 
+	int player_count = countplayers();
+
 	if(place < 1)
-		place = players;
-	else if(place > players)
+		place = player_count;
+	else if(place > player_count)
 		place = 1;
 	
 	start = place;
-	while(true) {
+	while(1) {
 		for(i = 0; i < game.maxclients; i++) {
 			e = g_edicts + 1 + i;
 			if(e->inuse && (!place || e->place == place) && e != ent && e->lithium_flags & LITHIUM_PLAYING) {
@@ -1485,8 +1487,8 @@ qboolean ChaseFind(edict_t *ent, int place, int searchdir) {
 
 		place += searchdir;
 		if(place < 1)
-			place = players;
-		else if(place > players)
+			place = player_count;
+		else if(place > player_count)
 			place = 1;
 		if(place == start)
 			place = 0;
@@ -1709,11 +1711,11 @@ char *file_gamedir(char *name) {
 	char gdir[MAX_OSPATH];
 
 	if(strchr(name, '/') || strchr(name, '\\'))
-		strlcpy(file_gamedir_buffer, name, sizeof(file_gamedir_buffer));
+		Q_strncpyz(file_gamedir_buffer, name, sizeof(file_gamedir_buffer));
 	else {
-		strlcpy(gdir, gi.cvar("gamedir", "", 0)->string, sizeof(gdir));
+		Q_strncpyz(gdir, gi.cvar("gamedir", "", 0)->string, sizeof(gdir));
 		if(!strlen(gdir))
-			strlcpy(gdir, "baseq2", sizeof(gdir));
+			Q_strncpyz(gdir, "baseq2", sizeof(gdir));
 		Com_sprintf(file_gamedir_buffer, sizeof(file_gamedir_buffer), "%s/%s", gdir, name);
 	}
 
@@ -1742,11 +1744,11 @@ void String_Crop(char *str) {
 	c = gi.TagMalloc(l, TAG_GAME);
 	if (!c)
 		return;
-	strlcpy(c, str, l);
+	Q_strncpyz(c, str, l);
 
 	while(*c != '\0' && (*c == ' ' || *c == '\t'))
 		c++;
-	strlcpy(str, c, l);
+	Q_strncpyz(str, c, l);
 	gi.TagFree(c);
 
 	c = str + (int)strlen(str) - 1;
@@ -1787,12 +1789,12 @@ void centerprintf(edict_t *ent, char *format, ...) {
 		return;
 
 	if(!strlen(format)) {
-		strlcpy(ent->centerprint, "", sizeof(ent->centerprint));
+		Q_strncpyz(ent->centerprint, "", sizeof(ent->centerprint));
 		Lithium_LayoutOff(ent, LAYOUT_CENTERPRINT);
 		return;
 	}
 
-	strlcpy(old, ent->centerprint, sizeof(old));
+	Q_strncpyz(old, ent->centerprint, sizeof(old));
 
 	va_start(argptr, format);
 	vsnprintf(ent->centerprint, sizeof(ent->centerprint), format, argptr);
@@ -1813,12 +1815,12 @@ void centerprintf2(edict_t *ent, char *format, ...) {
 		return;
 
 	if(!strlen(format)) {
-		strlcpy(ent->centerprint2, "", sizeof(ent->centerprint2));
+		Q_strncpyz(ent->centerprint2, "", sizeof(ent->centerprint2));
 		Lithium_LayoutOff(ent, LAYOUT_CENTERPRINT);
 		return;
 	}
 
-	strlcpy(old, ent->centerprint2, sizeof(old));
+	Q_strncpyz(old, ent->centerprint2, sizeof(old));
 
 	va_start(argptr, format);
 	vsnprintf(ent->centerprint2, sizeof(ent->centerprint2), format, argptr);
@@ -2213,13 +2215,13 @@ qboolean Lithium_CmdSay(edict_t *ent) {
 	if(lclient->muzzled) {
 		int i, r;
 		char buf[512] = "M";
-		for(i = 0; i < MAX(strlen(gi.args()), 8); i++) {
+		for(i = 0; i < MAX((int)strlen(gi.args()), 8); i++) {
 			r = random() * 10;
-			if(r < 4) strlcat(buf, "m", sizeof(buf));
-			else if(r < 7) strlcat(buf, "r", sizeof(buf));
-			else strlcat(buf, "h", sizeof(buf));
+			if(r < 4) Q_strncatz(buf, "m", sizeof(buf));
+			else if(r < 7) Q_strncatz(buf, "r", sizeof(buf));
+			else Q_strncatz(buf, "h", sizeof(buf));
 		}
-		strlcat(buf, ".\n", sizeof(buf));
+		Q_strncatz(buf, ".\n", sizeof(buf));
 		gi.cprintf(ent, PRINT_HIGH, buf);
 		return false;
 	}
@@ -2329,11 +2331,11 @@ void Lithium_Info(edict_t *ent) {
 	Menu_Create(ent, 4, 15);
 	Menu_Title(ent, "Information");
 
-	Menu_AddLine(ent, MENU_FUNC, 0, "Author Info", Lithium_About);
-	Menu_AddLine(ent, MENU_FUNC, 0, "Console commands", Lithium_Commands1);
-	Menu_AddLine(ent, MENU_FUNC, 0, "Commands to bind", Lithium_Commands2);
-	Menu_AddLine(ent, MENU_FUNC, 0, "About the runes", Lithium_AboutRunes);
-	Menu_AddLine(ent, MENU_FUNC, 0, "Using the chasecam", Lithium_AboutChasecam);
+	Menu_AddLine(ent, MENU_FUNC, 0, "Author Info", (uintptr_t*)Lithium_About);
+	Menu_AddLine(ent, MENU_FUNC, 0, "Console commands", (uintptr_t*)Lithium_Commands1);
+	Menu_AddLine(ent, MENU_FUNC, 0, "Commands to bind", (uintptr_t*)Lithium_Commands2);
+	Menu_AddLine(ent, MENU_FUNC, 0, "About the runes", (uintptr_t*)Lithium_AboutRunes);
+	Menu_AddLine(ent, MENU_FUNC, 0, "Using the chasecam", (uintptr_t*)Lithium_AboutChasecam);
 
 	Menu_AddLine(ent, MENU_TEXT, 16, "Use [ and ] keys to pick", "m");
 	Menu_AddLine(ent, MENU_TEXT, 17, "Press Enter to select", "m");
@@ -2345,7 +2347,7 @@ void Lithium_Menu(edict_t *ent) {
 	Menu_Create(ent, 4, 16);
 	Menu_Title(ent, "Main Menu");
 
-	Menu_AddLine(ent, MENU_FUNC, 0, "Information", Lithium_Info);
+	Menu_AddLine(ent, MENU_FUNC, 0, "Information", (uintptr_t*)Lithium_Info);
 	if(ctf->value && !ent->client->resp.ctf_team)
 		Menu_AddLine(ent, MENU_CMD, 0, "CTF Team Menu", "inventory");
 	Menu_AddLine(ent, MENU_CMD, 0, "Observer mode", "menu;observe");
@@ -2403,7 +2405,7 @@ void Lithium_CTFMenu(edict_t *ent) {
 	Menu_AddLine(ent, MENU_BLANK, 0, "", 0);
 	Menu_AddLine(ent, MENU_CMD, 0, "Observer mode", "menu;observe");
 	Menu_AddLine(ent, MENU_CMD, 0, "Chasecam mode", "menu;chase");
-	Menu_AddLine(ent, MENU_FUNC, 0, "CTF Credits", Lithium_CTFCredits);
+	Menu_AddLine(ent, MENU_FUNC, 0, "CTF Credits", (uintptr_t*)Lithium_CTFCredits);
 	Menu_AddLine(ent, MENU_CMD, 0, "Lithium II Menu", "menu;menu");
 
 	Menu_AddLine(ent, MENU_TEXT, 17, "Use [ and ] keys to pick", "m");

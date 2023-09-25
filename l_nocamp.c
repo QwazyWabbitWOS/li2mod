@@ -62,7 +62,7 @@ void NoCamp_PutClientInServer(edict_t *ent) {
 
 void NoCamp_ClientThink(edict_t *ent, usercmd_t *ucmd) {
 	gclient_t *client = ent->client;
-	int i, move, last_num, sec;
+	int i, move, /*last_num,*/ sec;
 
 	if(!use_nocamp->value || !camp_threshold->value || !camp_time->value)
 		return;
@@ -85,7 +85,7 @@ void NoCamp_ClientThink(edict_t *ent, usercmd_t *ucmd) {
 
 	client->decamp_time = level.time + 0.5;
 
-	last_num = client->decamp_num;
+	//last_num = client->decamp_num;
 
 	client->decamp_move[client->decamp_num] = 
 		abs(ent->s.origin[0] - client->decamp_vec[0]) +

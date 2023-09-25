@@ -567,7 +567,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	Weapon_Generic2 (ent, FRAME_ACTIVATE_LAST, FRAME_FIRE_LAST, FRAME_IDLE_LAST, FRAME_DEACTIVATE_LAST, pause_frames, fire_frames, fire);
 
 	// run the weapon frame again if hasted
-	if(!stricmp(ent->client->pers.weapon->pickup_name, "Grapple") &&
+	if(!Q_stricmp(ent->client->pers.weapon->pickup_name, "Grapple") &&
 		ent->client->weaponstate == WEAPON_FIRING)
 		return;
 
@@ -965,7 +965,7 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 	float	rotation;
 	vec3_t	offset;
 	int		effect;
-	int		damage;
+	//int		damage;
 
 	ent->client->weapon_sound = gi.soundindex("weapons/hyprbl1a.wav");
 
@@ -998,10 +998,11 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 				effect = EF_HYPERBLASTER;
 			else
 				effect = 0;
-			if (deathmatch->value)
-				damage = 15;
-			else
-				damage = 20;
+
+			//if (deathmatch->value)
+			//	damage = 15;
+			//else
+			//	damage = 20;
 			//WF
 //			Blaster_Fire (ent, offset, damage, true, effect);
 			Blaster_Fire (ent, offset, hyperblaster_damage->value, true, effect);

@@ -28,7 +28,13 @@
 #include "net.h"
 #include "strl.h"
 
-#ifdef WIN32
+size_t Q_strncpyz(char* dst, const char* src, size_t dstSize);
+
+#ifdef _WIN32
+#pragma warning(disable : 4100)	// C4100 unreferenced formal parameter
+#endif
+
+#ifdef _WIN32
 #define socklen_t int
 #endif
 
@@ -36,7 +42,7 @@
 #define MAX_BACKLOG 16
 
 SOCKET ssock = 0;
-int rsock[MAX_LISTEN];
+SOCKET rsock[MAX_LISTEN];
 struct sockaddr_in raddr[MAX_LISTEN];
 char *recvbuf[MAX_LISTEN];
 char *recvpos[MAX_LISTEN];
@@ -44,7 +50,7 @@ char *recvpos[MAX_LISTEN];
 int send_total = 0;
 int recv_total = 0;
 
-#ifdef WIN32
+#ifdef _WIN32
 #define _ioctl(s, cmd, argp) ioctlsocket(s, cmd, argp)
 #else
 #define _ioctl(s, cmd, argp) ioctl(s, cmd, argp)
@@ -54,7 +60,7 @@ void sigpipe(int num) {
 }
 
 int Net_Init(void) {
-#ifdef WIN32
+#ifdef _WIN32
 	WSADATA wsadata;
 	if(WSAStartup(MAKEWORD(1, 1), &wsadata))
 		return 0;
@@ -74,7 +80,7 @@ void Net_Exit(void) {
 	if(ssock)
 		Net_Close(ssock);
 
-#ifdef WIN32
+#ifdef _WIN32
 	WSACleanup();
 #endif
 }
@@ -92,7 +98,7 @@ int Net_SetNonBlocking(SOCKET sock) {
 	setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char *)&argp, sizeof(argp));
 
 	// set non-blocking
-	return _ioctl(sock, FIONBIO, &argp);
+	return _ioctl(sock, FIONBIO, (unsigned long*)& argp);
 }
 
 int Net_Listen(int port) {
@@ -255,7 +261,7 @@ int Net_Recv(int sock, char *buf, int len) {
 	r = recvbuf[i];
 	while(r < recvpos[i]) {
 		if(!*r) {
-			strlcpy(buf, recvbuf[i], sizeof(buf));
+			Q_strncpyz(buf, recvbuf[i], sizeof(buf));
 			rlen = (int)strlen(buf) + 1;
 			memcpy(recvbuf[i], r + 1, recvpos[i] - r);
 			recvpos[i] -= rlen;
@@ -277,7 +283,7 @@ int Net_Recv(int sock, char *buf, int len) {
 		return -1;
 
 	// must be an error (rlen == -1)
-#ifdef WIN32
+#ifdef _WIN32
 	err = WSAGetLastError();
 	if(err == WSAEWOULDBLOCK)
 		return 0;
@@ -295,12 +301,12 @@ int Net_Recv(int sock, char *buf, int len) {
 }
 
 int Net_Close(SOCKET sock) {
-	int i;
+	unsigned i;
 	for(i = 0; i < MAX_LISTEN; i++)
-		if(sock == rsock[i])
+		if(sock == (SOCKET)rsock[i])
 			rsock[i] = 0;
 
-#ifdef WIN32
+#ifdef _WIN32
 	return closesocket(sock);
 #else
 	return close(sock);
@@ -325,7 +331,7 @@ int start_sec;
 int start_msec;
 
 void ReadTime(int *sec, int *msec) {
-#ifdef WIN32
+#ifdef _WIN32
     struct _timeb t;
     _ftime(&t);
 	*sec = (int)t.time;
@@ -369,7 +375,7 @@ char *Net_GetAddrStr(int sock) {
 }
 
 void Sys_Sleep(int msec) {
-#ifdef WIN32
+#ifdef _WIN32
 	Sleep(msec);
 #else
 	//QW// changed from usleep to sleep
@@ -382,22 +388,22 @@ void Split(char *msg, char *s1, unsigned int s1len, char *s2, unsigned int s2len
 	char *c;
 	char buf[BUF_LEN];
 
-	strlcpy(buf, msg, sizeof(buf));
+	Q_strncpyz(buf, msg, sizeof(buf));
 	c = (char *)strstr(buf, DELIM);
 	if(c) {
 		*c = 0;
-		strlcpy(s1, buf, s1len);
-		strlcpy(s2, c + 1, s2len);
+		Q_strncpyz(s1, buf, s1len);
+		Q_strncpyz(s2, c + 1, s2len);
 	}
 	else {
-		strlcpy(s1, buf, s1len);
-		strlcpy(s2, "", s2len);
+		Q_strncpyz(s1, buf, s1len);
+		Q_strncpyz(s2, "", s2len);
 	}
 }
 
 void wf_strlwr(char *str) {
 	while(*str) {
-		*str = tolower(*str);
+		*str = (char)tolower(*str);
 		str++;
 	}
 }
@@ -477,12 +483,12 @@ void client(char *host, char *msg) {
 		;
 
 	for(i = 0; i < 5; i++) {
-		strlcpy(buf, msg, sizeof(buf));
+		Q_strncpyz(buf, msg, sizeof(buf));
 		Net_Send(sock, buf);
 		printf("sent packet, data = '%s'.\n", buf);
 	}
 
-	strlcpy(buf, "bye!", sizeof(buf));
+	Q_strncpyz(buf, "bye!", sizeof(buf));
 	Net_Send(sock, buf);
 	printf("sent packet, data = '%s'.\n", buf);
 

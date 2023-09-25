@@ -14,7 +14,7 @@ static void check_dodge (edict_t *self, vec3_t start, vec3_t dir, int speed)
 {
 	vec3_t	end;
 //	vec3_t	v;
-	trace_t	tr;
+	//trace_t	tr;
 //	float	eta;
 
 	// easy mode only ducks one quarter the time
@@ -24,7 +24,7 @@ static void check_dodge (edict_t *self, vec3_t start, vec3_t dir, int speed)
 			return;
 	}
 	VectorMA (start, 8192, dir, end);
-	tr = gi.trace (start, NULL, NULL, end, self, MASK_SHOT);
+	//tr = gi.trace (start, NULL, NULL, end, self, MASK_SHOT);
 	//WF
 	/*
 	if ((tr.ent) && (tr.ent->svflags & SVF_MONSTER) && (tr.ent->health > 0) && (tr.ent->monsterinfo.dodge) && infront(tr.ent, self))
@@ -414,7 +414,7 @@ static void Grenade_Explode (edict_t *ent)
 		mod = MOD_G_SPLASH;
 	T_RadiusDamage(ent, ent->owner, ent->dmg, ent->enemy, ent->dmg_radius, mod);
 
-	VectorMA (ent->s.origin, -0.02, ent->velocity, origin);
+	VectorMA (ent->s.origin, -0.02f, ent->velocity, origin);
 	gi.WriteByte (svc_temp_entity);
 	if (ent->waterlevel)
 	{
@@ -568,7 +568,7 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
 
 	// calculate position for the explosion entity
-	VectorMA (ent->s.origin, -0.02, ent->velocity, origin);
+	VectorMA (ent->s.origin, -0.02f, ent->velocity, origin);
 
 	if (other->takedamage)
 	{
@@ -650,6 +650,9 @@ void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick
 	edict_t		*ignore;
 	int			mask;
 	qboolean	water;
+
+	if (!self)
+		return;
 
 	VectorMA (start, 8192, aimdir, end);
 	VectorCopy (start, from);

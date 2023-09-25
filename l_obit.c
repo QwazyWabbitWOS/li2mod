@@ -76,14 +76,14 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 	char		*message;
 	char		*message2;
 	char		*message3;
-	qboolean	ff;
+	//qboolean	ff;
 
 	if (coop->value && attacker->client)
 		meansOfDeath |= MOD_FRIENDLY_FIRE;
 
 	if (deathmatch->value || coop->value)
 	{
-		ff = meansOfDeath & MOD_FRIENDLY_FIRE;
+		//ff = meansOfDeath & MOD_FRIENDLY_FIRE;
 		mod = meansOfDeath & ~MOD_FRIENDLY_FIRE;
 		message = NULL;
 		message2 = "";

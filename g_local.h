@@ -31,8 +31,8 @@
 //==================================================================
 
 // view pitching times
-#define DAMAGE_TIME		0.5
-#define	FALL_TIME		0.3
+#define DAMAGE_TIME		0.5f
+#define	FALL_TIME		0.3f
 
 
 // edict->spawnflags
@@ -60,7 +60,7 @@
 #define FL_RESPAWN				0x80000000	// used for item respawning
 
 
-#define	FRAMETIME		0.1
+#define	FRAMETIME		0.1f
 
 // memory tags to allow dynamic memory to be cleaned up
 #define	TAG_GAME	765		// clear when unloading the dll
@@ -1035,7 +1035,7 @@ struct gclient_s
 //WF
 typedef struct pvar_s pvar_t;
 typedef struct lclient_s lclient_t;
-#ifndef WIN32
+#ifndef _WIN32
 	#define stricmp Q_strcasecmp
 #endif
 //WF

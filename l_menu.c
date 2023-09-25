@@ -32,17 +32,24 @@ void Menu_Create(edict_t *ent, int startline, int endline) {
 		Menu_Destroy(ent);
 
 	ent->menu = (menu_t *)malloc(sizeof(menu_t));
-	ent->menu->firstline = NULL;
-	ent->menu->lastline = NULL;
-	ent->menu->sel = NULL;
-	ent->menu->startline = startline;
-	ent->menu->endline = endline;
-	ent->menu->page = 0;
-	ent->menu->changed = true;
-	ent->menu->editing = false;
-	ent->menu->cancel_func = NULL;
-	ent->menu->xoff = 15;
-	ent->menu->yoff = 16;
+	if (ent->menu)
+	{
+		ent->menu->firstline = NULL;
+		ent->menu->lastline = NULL;
+		ent->menu->sel = NULL;
+		ent->menu->startline = startline;
+		ent->menu->endline = endline;
+		ent->menu->page = 0;
+		ent->menu->changed = true;
+		ent->menu->editing = false;
+		ent->menu->cancel_func = NULL;
+		ent->menu->xoff = 15;
+		ent->menu->yoff = 16;
+	}
+	else
+	{
+		gi.dprintf("%s: allocation failed.\n", __func__);
+	}
 
 	Lithium_LayoutOn(ent, LAYOUT_MENU);
 	Lithium_LayoutOff(ent, LAYOUT_SCORES);
@@ -62,28 +69,30 @@ void Menu_AddLine(edict_t *ent, int type, int line, char *text, void *data) {
 	menuline_t *menuline;
 
 	menuline = (menuline_t *)malloc(sizeof(menuline_t));
-	menuline->prev = NULL;
-	menuline->next = NULL;
+	if (menuline)
+	{
+		menuline->prev = NULL;
+		menuline->next = NULL;
 
-	if(!ent->menu->firstline) {
-		ent->menu->firstline = menuline;
-		ent->menu->lastline = menuline;
-	}
-	else {
-		menuline->prev = ent->menu->lastline;
-		ent->menu->lastline->next = menuline;
-		ent->menu->lastline = menuline;
-	}
+		if (!ent->menu->firstline) {
+			ent->menu->firstline = menuline;
+			ent->menu->lastline = menuline;
+		}
+		else {
+			menuline->prev = ent->menu->lastline;
+			ent->menu->lastline->next = menuline;
+			ent->menu->lastline = menuline;
+		}
 
-	menuline->type = type;
-	menuline->line = line;
-	menuline->text = text;
-	menuline->data = data;
-	menuline->selectable = type != MENU_TEXT;
-	menuline->textp = false;
-
+		menuline->type = type;
+		menuline->line = line;
+		menuline->text = text;
+		menuline->data = data;
+		menuline->selectable = type != MENU_TEXT;
+		menuline->textp = false;
 	if(!ent->menu->sel && menuline->selectable)
 		ent->menu->sel = menuline;
+	}
 }
 
 void Menu_AddText(edict_t *ent, int line, char *format, ...) {
@@ -170,7 +179,7 @@ char *Menu_GetLine(edict_t *ent, menuline_t *menuline, qboolean sel) {
 			}
 
 			if(menu->editing && sel)
-				strlcpy(right, menu->edit, sizeof(right));
+				Q_strncpyz(right, menu->edit, sizeof(right));
 			else if(!menu->editing)
 				show = true;
 			else if(menu->editing && !sel && menuline != menu->sel)
@@ -198,9 +207,9 @@ char *Menu_GetLine(edict_t *ent, menuline_t *menuline, qboolean sel) {
 					if(f == field) {
 						d = strchr(c, ':');
 						if(d)
-							strlcpy_s(right, c, sizeof(right), d - c);
+							Q_strncpyz(right, c, sizeof(right));
 						else
-							strlcpy(right, c, sizeof(right));
+							Q_strncpyz(right, c, sizeof(right));
 					}
 					c = strchr(c, ':');
 					f++;
@@ -208,9 +217,9 @@ char *Menu_GetLine(edict_t *ent, menuline_t *menuline, qboolean sel) {
 			}
 			else if(edit[0] == '^') {
 				if(value)
-					strlcpy(right, "On", sizeof(right));
+					Q_strncpyz(right, "On", sizeof(right));
 				else
-					strlcpy(right, "Off", sizeof(right));
+					Q_strncpyz(right, "Off", sizeof(right));
 			}
 		}
 	}
@@ -220,10 +229,10 @@ char *Menu_GetLine(edict_t *ent, menuline_t *menuline, qboolean sel) {
 	if(strlen(right))
 		snprintf(string, sizeof(string), "%-*s%s", 24 - (int)strlen(right), menuline->text, right);
 	else
-		strlcpy(string, menuline->text, sizeof(string));
+		Q_strncpyz(string, menuline->text, sizeof(string));
 
 	if(sel) {
-		strlcpy(format, string, sizeof(format));
+		Q_strncpyz(format, string, sizeof(format));
 		Com_sprintf(string, sizeof(string), "> %-24s <", format);
 		x -= 16;
 		colored = true;
@@ -276,7 +285,7 @@ int Menu_Draw(edict_t *ent) {
 	menuline = ent->menu->firstline;
 	while(menuline) {
 		if(menuline->line) {
-			strlcat(string, Menu_GetLine(ent, menuline, false), sizeof(string));
+			Q_strncatz(string, Menu_GetLine(ent, menuline, false), sizeof(string));
 			if(ent->menu->sel && !ent->menu->sel->line && menuline->selectable)
 				ent->menu->sel = menuline;
 		}
@@ -419,12 +428,12 @@ void Menu_NextPage(edict_t *ent) {
 
 int countfields(char *edit) {
 	char *c = edit;
-	int fields = 0;
+	int f = 0;
 	while(c) {
 		c = strchr(c + 1, ':');
-		fields++;
+		f++;
 	}
-	return fields;
+	return f;
 }
 
 void Menu_Use(edict_t *ent) {
@@ -450,10 +459,10 @@ void Menu_Use(edict_t *ent) {
 					Menu_EditEnd(ent);
 			}
 			else if(strchr(lvar->edit, ':')) {
-				int fields = countfields(lvar->edit);
+				int field_count = countfields(lvar->edit);
 				char buf[8];
 				int x = lvar->value + 1;
-				if(x >= fields)
+				if(x >= field_count)
 					x = 0;
 				snprintf(buf, sizeof(buf), "%d", x);
 				gi.cvar_set(lvar->cvar->name, buf);
@@ -484,9 +493,9 @@ void Menu_Use(edict_t *ent) {
 					Menu_EditEnd(ent);
 			}
 			else if(strchr(pvar->edit, ':')) {
-				int fields = countfields(pvar->edit);
+				int field_count = countfields(pvar->edit);
 				(*pvar->value)++;
-				if(*pvar->value >= fields)
+				if(*pvar->value >= field_count)
 					*pvar->value = 0;
 			}
 			else if(pvar->edit[0] == '^')
@@ -543,11 +552,11 @@ void Menu_EditBegin(edict_t *ent) {
 
 	if(ent->menu->sel->type == MENU_LVAR) {
 		lvar_t *lvar = (lvar_t *)ent->menu->sel->data;
-		strlcpy(ent->menu->edit, lvar->edit, sizeof(ent->menu->edit));
+		Q_strncpyz(ent->menu->edit, lvar->edit, sizeof(ent->menu->edit));
 	}
 	else if(ent->menu->sel->type == MENU_PVAR) {
 		pvar_t *pvar = (pvar_t *)pvar_find(ent, ent->menu->sel->data);
-		strlcpy(ent->menu->edit, pvar->edit, sizeof(ent->menu->edit));
+		Q_strncpyz(ent->menu->edit, pvar->edit, sizeof(ent->menu->edit));
 	}
 	else
 		return;

@@ -24,6 +24,8 @@
 
 #include "g_local.h"
 
+void (*FP)(edict_t* e);
+
 lvar_t *admin_code;
 
 lvar_t *adminlist;
@@ -65,7 +67,8 @@ void Admin_ClientThink(edict_t *ent) {
 qboolean Admin_Validate(edict_t *ent) {
 	FILE *file;
 	char *c, buf[128];
-	char username[128], ipmask[128], password[128];
+	char username[128], ipmask[128];
+	char admpassword[128] = { 0 };
 	int ip[4];
 	int access;
 	qboolean match;
@@ -103,18 +106,18 @@ qboolean Admin_Validate(edict_t *ent) {
 		if(c) {
 			*c = 0;
 			
-			strlcpy(username, buf, sizeof(username));
+			Q_strncpyz(username, buf, sizeof(username));
 			if(username[0] == '\"' && username[strlen(username) - 1] == '\"') {
-				strlcpy(username, username + 1, sizeof(username));
+				Q_strncpyz(username, username + 1, sizeof(username));
 				username[strlen(username) - 1] = 0;
 			}
 
 			c++;
-			sscanf(c, "%s %d %s", ipmask, &access, password);
+			sscanf(c, "%s %d %s", ipmask, &access, admpassword);
 		}
 		else {
-			strlcpy(username, "*", sizeof(username));
-			sscanf(buf, "%s %d %s", ipmask, &access, password);
+			Q_strncpyz(username, "*", sizeof(username));
+			sscanf(buf, "%s %d %s", ipmask, &access, admpassword);
 		}
 
 		IP_Scan(ipmask, ip);
@@ -131,7 +134,7 @@ qboolean Admin_Validate(edict_t *ent) {
 			}
 		}
 
-		if(match && IP_Match(ent->lclient->ip, ip) && !strcmp(password, pw) && access) {
+		if(match && IP_Match(ent->lclient->ip, ip) && !strcmp(admpassword, pw) && access) {
 			gi.bprintf(PRINT_HIGH, "%s has become an admin (level = %d).\n", ent->client->pers.netname, access);
 			ent->admin = access;
 
@@ -215,10 +218,10 @@ void Admin(edict_t *ent) {
 
 	Menu_AddLine(ent, MENU_BLANK, 0, "", 0);
 	Menu_AddLine(ent, MENU_CMD, 0, "General Settings", "_av 11");
-	Menu_AddLine(ent, MENU_FUNC, 0, "DMFlag Toggles", Admin_DMFlags);
+	Menu_AddLine(ent, MENU_FUNC, 0, "DMFlag Toggles", (uintptr_t*)Admin_DMFlags);
 	Menu_AddLine(ent, MENU_CMD, 0, "Lithium II Toggles", "_av 1");
-	Menu_AddLine(ent, MENU_FUNC, 0, "Client Settings Menu", Admin_ClientSettings);
-	Menu_AddLine(ent, MENU_FUNC, 0, "Item Settings Menu", Admin_ItemSettings);
+	Menu_AddLine(ent, MENU_FUNC, 0, "Client Settings Menu", (uintptr_t*)Admin_ClientSettings);
+	Menu_AddLine(ent, MENU_FUNC, 0, "Item Settings Menu", (uintptr_t*)Admin_ItemSettings);
 	Menu_AddLine(ent, MENU_CMD, 0, "Vote Settings", "_av 13");
 	Menu_AddLine(ent, MENU_CMD, 0, "Other Settings", "_av 7");
 	if(ctf->value)
@@ -458,14 +461,14 @@ void Admin_Ban(edict_t *ent) {
 	else
 		cmd = gi.argv(2);
 
-	strlcpy(arg, gi.args(), sizeof(arg));
+	Q_strncpyz(arg, gi.args(), sizeof(arg));
 	c = strchr(arg, ' ');
 	if(c)
-		strlcpy(arg, c + 1, sizeof(arg));
+		Q_strncpyz(arg, c + 1, sizeof(arg));
 	if(!ent) {
 		c = strchr(arg, ' ');
 		if(c)
-			strlcpy(arg, c + 1, sizeof(arg));
+			Q_strncpyz(arg, c + 1, sizeof(arg));
 	}
 
 	file = fopen(file_gamedir(banlist->string), "rt");
@@ -481,24 +484,24 @@ void Admin_Ban(edict_t *ent) {
 			strip(buf);
 			if(strlen(buf) >= 32)
 				buf[31] = 0;
-			strlcpy(ban[bans], buf, sizeof(ban[bans]));
+			Q_strncpyz(ban[bans], buf, sizeof(ban[bans]));
 			bans++;
 		}
 		fclose(file);
 	}
 
-	if(!stricmp(cmd, "add")) {
+	if(!Q_stricmp(cmd, "add")) {
 		if(bans == MAX_BANS) {
 			gi.cprintf(ent, PRINT_HIGH, "Too many bans already.\n");
 			return;
 		}
-		strlcpy(ban[bans], arg, sizeof(ban[bans]));
+		Q_strncpyz(ban[bans], arg, sizeof(ban[bans]));
 		bans++;
 		add = 1;
 	}
-	else if(!stricmp(cmd, "delete") || !stricmp(cmd, "del")) {
+	else if(!Q_stricmp(cmd, "delete") || !stricmp(cmd, "del")) {
 		for(i = 0; i < bans; i++) {
-			strlcpy(buf, ban[i], sizeof(buf));
+			Q_strncpyz(buf, ban[i], sizeof(buf));
 			c = strchr(buf, ' ');
 			if(!c)
 				c = strchr(buf, '\t');
@@ -512,19 +515,19 @@ void Admin_Ban(edict_t *ent) {
 		if(i == bans)
 			gi.cprintf(ent, PRINT_HIGH, "Ban not found.\n");
 	}
-	else if(!stricmp(cmd, "list")) {
+	else if(!Q_stricmp(cmd, "list")) {
 		for(i = 0; i < bans; i++)
 			gi.cprintf(ent, PRINT_HIGH, "  %s\n", ban[i]);
 		if(!bans)
 			gi.cprintf(ent, PRINT_HIGH, "Ban list empty.\n");
 	}
-	else if(!stricmp(cmd, "name")) {
+	else if(!Q_stricmp(cmd, "name")) {
 		edict_t *cl_ent;
 		for(i = 0; i < game.maxclients; i++) {
 			cl_ent = g_edicts + 1 + i;
 			if(!cl_ent->inuse)
 				continue;
-			if(!stricmp(arg, cl_ent->client->pers.netname)) {
+			if(!Q_stricmp(arg, cl_ent->client->pers.netname)) {
 				snprintf(ban[bans], sizeof(ban[bans]), "%d.%d.%d.%d", cl_ent->lclient->ip[0], cl_ent->lclient->ip[1], cl_ent->lclient->ip[2], cl_ent->lclient->ip[3]);
 				bans++;
 				add = 1;
@@ -632,7 +635,7 @@ qboolean Admin_ClientCommand(edict_t *ent) {
 	else if(ent->admin) {
 		lvar_t *lvar = first_lvar;
 		while(lvar) {
-			if(!stricmp(cmd, lvar->cvar->name)) {
+			if(!Q_stricmp(cmd, lvar->cvar->name)) {
 				if(!strlen(gi.argv(1)))
 					gi.cprintf(ent, PRINT_HIGH, "\"%s\" is \"%s\"\n", lvar->cvar->name, lvar->cvar->string);
 				else {

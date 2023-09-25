@@ -498,7 +498,7 @@ void WriteGame (char *filename, qboolean autosave)
 		gi.error ("Couldn't open %s", filename);
 
 	memset (str, 0, sizeof(str));
-	strlcpy (str, __DATE__, sizeof(str));
+	Q_strncpyz (str, __DATE__, sizeof(str));
 	fwrite (str, sizeof(str), 1, f);
 
 	game.autosaved = autosave;

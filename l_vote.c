@@ -45,7 +45,7 @@ qboolean vote_cancel = false;
 qboolean vote_instant = false;
 
 // all clients printf (excludes console)
-void acprintf(int level, char *format, ...) {
+void acprintf(int printlevel, char *format, ...) {
 	int i;
 	edict_t *ent;
 
@@ -60,7 +60,7 @@ void acprintf(int level, char *format, ...) {
 		ent = g_edicts + 1 + i;
 		if(!ent->inuse)
 			continue;
-		gi.cprintf(ent, level, text);
+		gi.cprintf(ent, printlevel, text);
 	}
 }
 
@@ -255,7 +255,7 @@ void Vote_Start2(edict_t *ent) {
 	voting = true;
 	vote_ent = ent;
 	vote_time = level.time;
-	strlcpy(vote_map, ent->lclient->vote_map, sizeof(vote_map));
+	Q_strncpyz(vote_map, ent->lclient->vote_map, sizeof(vote_map));
 	ent->lclient->vote_tries++;
 
 	for(i = 0; i < game.maxclients; i++) {
@@ -292,7 +292,7 @@ void Vote_Start(edict_t *ent) {
 		return;
 	}
 
-	strlcpy(ent->lclient->vote_map, gi.argv(2), sizeof(ent->lclient->vote_map));
+	Q_strncpyz(ent->lclient->vote_map, gi.argv(2), sizeof(ent->lclient->vote_map));
 
 	if(!mapvote_instant->value) {
 		vote_instant = false;

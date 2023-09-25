@@ -58,7 +58,7 @@ void Mapqueue_InitLevel(void) {
 
 void Mapqueue_Override(char *mapname) {
 	static char static_mapname[MAX_MAPNAME];
-	strlcpy(static_mapname, mapname, sizeof(static_mapname));
+	Q_strncpyz(static_mapname, mapname, sizeof(static_mapname));
 	override_map = static_mapname;
 }
 
@@ -108,23 +108,23 @@ void Mapqueue_SplitLine(char *buf, char *map, char *desc, char *start, char *end
 		c = strchr(buf, '\t');
 	if(!c) {
 		if(map)
-			strlcpy(map, buf, MAX_MAPNAME);
+			Q_strncpyz(map, buf, MAX_MAPNAME);
 		return;
 	}
 	if(map) {
-		strlcpy(map, buf, c - buf + 1);
+		Q_strncpyz(map, buf, c - buf + 1);
 	}
 
 	c = strchr(buf, '\"');
 	if(!c)
 		return;
-	strlcpy(tmp, c + 1, sizeof(tmp));
+	Q_strncpyz(tmp, c + 1, sizeof(tmp));
 	c = strchr(tmp, '\"');
 	if(desc) {
-		strlcpy(desc, tmp, c - tmp + 1);
+		Q_strncpyz(desc, tmp, c - tmp + 1);
 	}
 
-	strlcpy(tmp, c + 2, sizeof(tmp));
+	Q_strncpyz(tmp, c + 2, sizeof(tmp));
 	if(start && end)
 		sscanf(tmp, "%s %s", start, end);
 }
@@ -160,8 +160,8 @@ char *Mapqueue_GetMapName(void) {
 	if(!first->value && (resetqueue || strcmp(level.mapname, lastmap) || maps != lastmaps || strcmp(mapqueue->string, lastmapqueue)))
 		newlist = true;
 
-	strlcpy(lastmapqueue, mapqueue->string, sizeof(lastmapqueue));
-	strlcpy(lastmap, level.mapname, sizeof(lastmap));
+	Q_strncpyz(lastmapqueue, mapqueue->string, sizeof(lastmapqueue));
+	Q_strncpyz(lastmap, level.mapname, sizeof(lastmap));
 	lastmaps = maps;
 
 	if(newlist) {
@@ -260,9 +260,9 @@ void Mapqueue_Menu(edict_t *ent, char *cmd) {
 		Mapqueue_SplitLine(buf, map, desc, NULL, NULL);
 
 		if(strlen(desc))
-			strlcpy(c1[i], desc, sizeof(c1[i]));
+			Q_strncpyz(c1[i], desc, sizeof(c1[i]));
 		else
-			strlcpy(c1[i], map, sizeof(c1[i]));
+			Q_strncpyz(c1[i], map, sizeof(c1[i]));
 		snprintf(c2[i], sizeof(c2[i]), "%s %s", cmd, map);
 
 		Menu_AddLine(ent, MENU_CMD, 0, c1[i], c2[i]);
@@ -288,7 +288,7 @@ qboolean Mapqueue_Valid(char *filename, char *mapname) {
 			continue;
 
 		Mapqueue_SplitLine(buf, map, NULL, NULL, NULL);
-		if(!stricmp(mapname, map)) {
+		if(!Q_stricmp(mapname, map)) {
 			fclose(file);
 			return true;
 		}

@@ -2,14 +2,10 @@
 // q_shared.h -- included first by ALL program modules
 
 #ifdef _WIN32
-// unknown pragmas are SUPPOSED to be ignored, but....
-#pragma warning(disable : 4244)     // MIPS
-#pragma warning(disable : 4136)     // X86
-#pragma warning(disable : 4051)     // ALPHA
-
-#pragma warning(disable : 4018)     // signed/unsigned mismatch
-#pragma warning(disable : 4305)		// truncation from const double to float
-
+#pragma warning(disable : 4100)	// C4100 unreferenced formal parameter
+#pragma warning(disable : 4152)	// C4152: nonstandard extension, function/data pointer conversion in expression
+#pragma warning(disable : 4244)	// C4244 conversion from 'type1' to 'type2', possible loss of data
+#pragma warning(disable : 4996)	// disable warnings from VS 2010 about deprecated CRT functions (_CRT_SECURE_NO_WARNINGS).
 #endif
 
 #include <assert.h>
@@ -18,21 +14,13 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <time.h>
+#include <ctype.h>
+#include <limits.h>
+#include <errno.h>
 
 #include "strl.h"
-
-#if (defined _M_IX86 || defined __i386__) && !defined C_ONLY && !defined __sun__
-#define id386	1
-#else
-#define id386	0
-#endif
-
-#if defined _M_ALPHA && !defined C_ONLY
-#define idaxp	1
-#else
-#define idaxp	0
-#endif
 
 typedef unsigned char 		byte;
 typedef enum {false, true}	qboolean;
@@ -124,15 +112,6 @@ extern vec3_t vec3_origin;
 #define	nanmask (255<<23)
 
 #define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
-
-// microsoft's fabs seems to be ungodly slow...
-//float Q_fabs (float f);
-//#define	fabs(f) Q_fabs(f)
-#if !defined C_ONLY && !defined __linux__ && !defined __sgi
-extern long Q_ftol( float f );
-#else
-#define Q_ftol( f ) ( long ) (f)
-#endif
 
 #define DotProduct(x,y)			(x[0]*y[0]+x[1]*y[1]+x[2]*y[2])
 #define VectorSubtract(a,b,c)	(c[0]=a[0]-b[0],c[1]=a[1]-b[1],c[2]=a[2]-b[2])
@@ -230,6 +209,8 @@ inline int Q_tolower(int c)
 int Q_stricmp (char *s1, char *s2);
 int Q_strcasecmp (char *s1, char *s2);
 int Q_strncasecmp (char *s1, char *s2, int n);
+size_t Q_strncpyz(char* dst, const char* src, size_t dstSize);
+size_t Q_strncatz(char* dst, const char* src, size_t dstSize);
 
 //=============================================
 

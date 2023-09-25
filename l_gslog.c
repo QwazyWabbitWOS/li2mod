@@ -41,10 +41,10 @@ void GSLog(char *format, ...) {
 	vsnprintf(buf, sizeof(buf), format, argptr);
 	va_end(argptr);
 
-#ifdef WIN32
-	strlcat(buf, "\n", sizeof(buf));
+#ifdef _WIN32
+	Q_strncatz(buf, "\n", sizeof(buf));
 #else
-	strlcat(buf, "\r\n", sizeof(buf));
+	Q_strncatz(buf, "\r\n", sizeof(buf));
 #endif
 
 	fprintf(gslog_file, "%s", buf);

@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "g_local.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include "direct.h"
 #endif
 
@@ -103,7 +103,7 @@ void Highscores_Update(void) {
 				new_place = (place_t *)gi.TagMalloc(sizeof(place_t), TAG_LEVEL);
 
 				new_place->score = ent->client->resp.score;
-				strlcpy(new_place->name, ent->client->pers.netname, sizeof(new_place->name));
+				Q_strncpyz(new_place->name, ent->client->pers.netname, sizeof(new_place->name));
 				Com_sprintf(new_place->date, sizeof(new_place->date), "%02d/%02d/%04d", tm->tm_mon + 1, tm->tm_mday, 1900 + tm->tm_year);
 
 				new_place->next = place;
@@ -130,7 +130,7 @@ void Highscores_Update(void) {
 			new_place->next = NULL;
 
 			new_place->score = ent->client->resp.score;
-			strlcpy(new_place->name, ent->client->pers.netname, sizeof(new_place->name));
+			Q_strncpyz(new_place->name, ent->client->pers.netname, sizeof(new_place->name));
 			Com_sprintf(new_place->date, sizeof(new_place->date), "%02d/%02d/%04d", tm->tm_mon + 1, tm->tm_mday, 1900 + tm->tm_year);
 
 			if(!place)
@@ -156,14 +156,20 @@ void Highscores_Update(void) {
 	if(!place)
 		return;
 
-#ifdef WIN32
+#ifdef _WIN32
 	int stat = _mkdir(file_gamedir("hiscores"));
 #else
 	int stat = mkdir(file_gamedir("hiscores"), S_IRWXU | S_IRWXG | S_IRWXO);
 #endif
+	if (stat != 0) {
+		gi.dprintf("Could not create directory. %s\n", strerror(errno));
+	}
+
 	file = fopen(Highscores_File(), "wt");
-	if(!file)
+	if (!file) {
+		gi.dprintf("Could not open file \"%s\" %s.\n\n", file, strerror(errno));
 		return;
+	}
 
 	i = 0;
 	while(place && i < 10) {
@@ -203,16 +209,16 @@ void Highscores_Scoreboard(char *string, unsigned int strlen, int *down) {
 
 	if(!level.intermissiontime) {
 		*down -= 4;
-		strlcat(string, va("yv %d xv 0 cstring \"Time left is %d:%02d\" ", *down, sec / 60, sec % 60), strlen);
+		Q_strncatz(string, va("yv %d xv 0 cstring \"Time left is %d:%02d\" ", *down, sec / 60, sec % 60), strlen);
 		*down += 8;
 	}
 
 	if(place && place->score > 0) {
-		strlcat(string, va("yv %d xv 0 cstring \"High score is %d (in %d min)\" ", *down, place->score, (int)timelimit->value), strlen);
-		strlcat(string, va("yv %d xv 0 cstring \"by %s on %s\" ", *down + 8, place->name, place->date), strlen);
+		Q_strncatz(string, va("yv %d xv 0 cstring \"High score is %d (in %d min)\" ", *down, place->score, (int)timelimit->value), strlen);
+		Q_strncatz(string, va("yv %d xv 0 cstring \"by %s on %s\" ", *down + 8, place->name, place->date), strlen);
 	}
 	else
-		strlcat(string, va("yv %d xv 0 cstring \"No high score for this map\" ", *down), strlen);
+		Q_strncatz(string, va("yv %d xv 0 cstring \"No high score for this map\" ", *down), strlen);
 
 	*down += 24;
 }
@@ -223,10 +229,10 @@ int Highscores_FullScoreboard(edict_t *ent) {
 
 	place_t *place = first_place;
 
-	strlcat(string, va("xv 0 yv 40 cstring \"High scores for %s (in %d min)\" ", level.mapname, (int)timelimit->value), sizeof(string));
+	Q_strncatz(string, va("xv 0 yv 40 cstring \"High scores for %s (in %d min)\" ", level.mapname, (int)timelimit->value), sizeof(string));
 	while(place) {
 		i++;
-		strlcat(string, va("xv -4 yv %d cstring \"%2d %-16s %3d on %s\" ", 56 + i * 8, i, place->name, place->score, place->date), sizeof(string));
+		Q_strncatz(string, va("xv -4 yv %d cstring \"%2d %-16s %3d on %s\" ", 56 + i * 8, i, place->name, place->score, place->date), sizeof(string));
 		place = place->next;
 	}
 

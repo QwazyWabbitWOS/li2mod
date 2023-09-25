@@ -208,16 +208,16 @@ int StatusBar_Update(edict_t *ent) {
 	ent->lithium_flags &= ~LITHIUM_STATUSBAR;
 
 	if(ent->hud > HUD_NONE)
-		strlcat(statusbar, bottombar, sizeof(statusbar));
+		Q_strncatz(statusbar, bottombar, sizeof(statusbar));
 
 	if(ent->hud == HUD_NORMAL || (ent->hud == HUD_AMMO && !ctf->value))
-		strlcat(statusbar, "yt 0 xr -50 num 3 25 ", sizeof(statusbar));
+		Q_strncatz(statusbar, "yt 0 xr -50 num 3 25 ", sizeof(statusbar));
 
 	if(ent->hud == HUD_AMMO && !ctf->value)
-		strlcat(statusbar, ammobar, sizeof(statusbar));
+		Q_strncatz(statusbar, ammobar, sizeof(statusbar));
 
 	if(ent->hud == HUD_LITHIUM && !ctf->value) {
-		strlcat(statusbar,
+		Q_strncatz(statusbar,
 			"if 31 "
 			"xr -44 "
 			"yt 16 string Frags "
@@ -240,7 +240,7 @@ int StatusBar_Update(edict_t *ent) {
 	}
 
 	if(ctf->value)
-		strlcat(statusbar, ctf_statusbar, sizeof(statusbar));
+		Q_strncatz(statusbar, ctf_statusbar, sizeof(statusbar));
 
 	gi.WriteByte(0x0D);
 	gi.WriteShort(5);
@@ -276,7 +276,7 @@ char *GetMOTD(void) {
 
 	pos = -60 - lines * 8;
 
-	strlcpy(motdstr, "xl 8 ", sizeof(motdstr));
+	Q_strncpyz(motdstr, "xl 8 ", sizeof(motdstr));
 
 	line = 4;
 	if(file) {
@@ -292,7 +292,7 @@ char *GetMOTD(void) {
 
 			if(strlen(buf)) {
 				Com_sprintf(add, sizeof(add), "yb %d string \"%s\" ", pos, buf);
-				strlcat(motdstr, add, sizeof(motdstr));
+				Q_strncatz(motdstr, add, sizeof(motdstr));
 			}
  
 			pos += 8;
@@ -313,12 +313,12 @@ char *GetMOTD(void) {
 		"yb %d string \"http://quake2.lithium.com\" "
 		, pos, lithium_modname, pos + 8, pos + 16);
 
-	strlcat(motdstr, add, sizeof(motdstr));
+	Q_strncatz(motdstr, add, sizeof(motdstr));
 #ifdef GIT_HASH
 	snprintf(add, sizeof(add),
 		"yb %d string \"git " GIT_HASH "\" "
 		, pos + 24);
-	strlcat(motdstr, add, sizeof(motdstr));
+	Q_strncatz(motdstr, add, sizeof(motdstr));
 #endif
 
 	return motdstr;
@@ -333,7 +333,7 @@ char *GetNews(void) {
 	char add[256];
 	static char newsstr[1024];
 
-	file = fopen(file_gamedir(news->string), "rt");
+	file = fopen(file_gamedir(news_file->string), "rt");
 
 	isnews = false;
 
@@ -352,7 +352,7 @@ char *GetNews(void) {
 
 	pos = -60 - lines * 8;
 
-	strlcpy(newsstr, "xl 8 ", sizeof(newsstr));
+	Q_strncpyz(newsstr, "xl 8 ", sizeof(newsstr));
 
 	line = 1;
 	while(fgets(buf, 256, file)) {
@@ -363,7 +363,7 @@ char *GetNews(void) {
 
 		if(strlen(buf)) {
 			Com_sprintf(add, sizeof(add), "yb %d string \"%s\" ", pos, buf);
-			strlcat(newsstr, add, sizeof(newsstr));
+			Q_strncatz(newsstr, add, sizeof(newsstr));
 		}
  
 		pos += 8;
@@ -372,7 +372,7 @@ char *GetNews(void) {
 		if(line == lines)
 			break;
 	}
-	strlcat(newsstr, add, sizeof(newsstr));
+	Q_strncatz(newsstr, add, sizeof(newsstr));
 
 	fclose(file);
 
@@ -386,7 +386,7 @@ char *GetCenterprint(edict_t *ent) {
 	centerprint[0] = '\0';
 
 	if(ent->centerprint && ent->centerprint2 && strlen(ent->centerprint2))
-		strlcpy(ent->centerprint, ent->centerprint2, sizeof(ent->centerprint));
+		Q_strncpyz(ent->centerprint, ent->centerprint2, sizeof(ent->centerprint));
 
 	if(ent->centerprint && strlen(ent->centerprint)) {
 		int i, len, lines = 0;
@@ -402,13 +402,13 @@ char *GetCenterprint(edict_t *ent) {
 				len = d - c;
 				if(len > 39)
 					len = 39;
-				strlcpy(line[lines], c, sizeof(line[lines]));
+				Q_strncpyz(line[lines], c, sizeof(line[lines]));
 				lines++;
 			}
 			c = d + 1;
 		}
 
-		strlcat(centerprint, "xv 0 ", sizeof(centerprint));
+		Q_strncatz(centerprint, "xv 0 ", sizeof(centerprint));
 		for(i = 0; i < lines; i++) {
 			if(strlen(line[i]))
 				snprintf(centerprint + strlen(centerprint), sizeof(centerprint)-strlen(centerprint), "yv %d cstring \"%s\" ", (200 - lines * 8) / 2 + i * 8, line[i]);
@@ -458,13 +458,13 @@ int Layout_Update(edict_t *ent) {
 	}
 	
 	if(ent->layout & LAYOUT_CENTERPRINT) {
-		strlcat(string, GetCenterprint(ent), sizeof(string));
+		Q_strncatz(string, GetCenterprint(ent), sizeof(string));
 	}
 
 	if((level.time > ent->motd_time || !(ent->layout & LAYOUT_MOTD)) && ent->layout & LAYOUT_NEWS && isnews) {
-		strlcat(string, GetNews(), sizeof(string));
+		Q_strncatz(string, GetNews(), sizeof(string));
 	} else if(ent->layout & LAYOUT_MOTD) {
-		strlcat(string, GetMOTD(), sizeof(string));
+		Q_strncatz(string, GetMOTD(), sizeof(string));
 	} else {
 		if(ent->layout & LAYOUT_CHASECAM && ent->client->chase_target)
 			snprintf(string + strlen(string), sizeof(string)-strlen(string), "xv 2 yb -68 string2 \"Chasing %s\" ", ent->client->chase_target->client->pers.netname);
@@ -505,18 +505,18 @@ char *Lithium_GetAd(int down) {
 
 	for(i = 0; i < 5; i++)
 		if(strlen(ad[i]))
-			strlcat(thead, va("xv 0 yv %d cstring \"%s\" ", down + i * 8, ad[i]), sizeof(thead));
+			Q_strncatz(thead, va("xv 0 yv %d cstring \"%s\" ", down + i * 8, ad[i]), sizeof(thead));
 	return thead;
 }
 
 void Lithium_SetAd(int num, char *str) {
-	strlcpy(ad[num], str, sizeof(ad[num]));
+	Q_strncpyz(ad[num], str, sizeof(ad[num]));
 }
 
 int Lithium_Scoreboard(edict_t *ent, edict_t *killer) {
 	char	entry[1024];
 	char	string[1400] = "";
-	int		stringlength;
+	//int		stringlength;
 	int		i, j;
 	gclient_t	*cl;
 	edict_t		*cl_ent;
@@ -543,17 +543,17 @@ int Lithium_Scoreboard(edict_t *ent, edict_t *killer) {
 	// print level name and exit rules
 	string[0] = 0;
 
-	stringlength = (int)strlen(string);
+	//stringlength = (int)strlen(string);
 
 	if(use_highscores->value)
 		Highscores_Scoreboard(string, sizeof(string), &down);
 
 	if(ent->board == SCORES_BYFRAGS)
-		strlcat(string, va("yv %d xv 152 string2 Frags xv 208 string \"FPH Time Ping\" ", down), sizeof(string));
+		Q_strncatz(string, va("yv %d xv 152 string2 Frags xv 208 string \"FPH Time Ping\" ", down), sizeof(string));
 	else if(ent->board == SCORES_BYFPH)
-		strlcat(string, va("yv %d xv 152 string \"Frags      Time Ping\" xv 208 string2 FPH ", down), sizeof(string));
+		Q_strncatz(string, va("yv %d xv 152 string \"Frags      Time Ping\" xv 208 string2 FPH ", down), sizeof(string));
 	
-	strlcat(string, "xv 0 ", sizeof(string));
+	Q_strncatz(string, "xv 0 ", sizeof(string));
 	for(i = 0; i < ent->lclient->board_show; i++) {
 		j = ent->sel + i;
 		if(j >= sorted_ents)
@@ -583,16 +583,16 @@ int Lithium_Scoreboard(edict_t *ent, edict_t *killer) {
 					cl->pers.netname, MIN(cl_ent->lclient->ping, 999));
 		}
 
-		strlcat(string, entry, sizeof(string));
+		Q_strncatz(string, entry, sizeof(string));
 	}
 
 	if(level.intermissiontime) {
-		strlcat(string, Lithium_GetAd(down + ent->lclient->board_show * 10 + 32), sizeof(string));
+		Q_strncatz(string, Lithium_GetAd(down + ent->lclient->board_show * 10 + 32), sizeof(string));
 	}
 	else {
 		if(countclients() > ent->lclient->board_show)
-			strlcat(string, va("xv 0 yv %d cstring \"Use [ and ] to scroll scores\" ", down + ent->lclient->board_show * 10 + 16), sizeof(string));
-		strlcat(string, va("xv 0 yv %d cstring \"Press 0 for Lithium II menu\" ", down + ent->lclient->board_show * 10 + 24), sizeof(string));
+			Q_strncatz(string, va("xv 0 yv %d cstring \"Use [ and ] to scroll scores\" ", down + ent->lclient->board_show * 10 + 16), sizeof(string));
+		Q_strncatz(string, va("xv 0 yv %d cstring \"Press 0 for Lithium II menu\" ", down + ent->lclient->board_show * 10 + 24), sizeof(string));
 	}
 
 	gi.WriteByte(svc_layout);

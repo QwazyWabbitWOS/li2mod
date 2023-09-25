@@ -478,7 +478,7 @@ extern lvar_t *knockback_adjust;
 extern lvar_t *knockback_self;
 
 extern lvar_t *motd;
-extern lvar_t *news;
+extern lvar_t *news_file;
 extern lvar_t *news_time;
 extern lvar_t *banlist;
 

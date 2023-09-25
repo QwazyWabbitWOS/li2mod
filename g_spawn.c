@@ -70,7 +70,7 @@ void SP_target_earthquake (edict_t *ent);
 void SP_target_character (edict_t *ent);
 void SP_target_string (edict_t *ent);
 
-void SP_worldspawn (edict_t *ent);
+void SP_worldspawn(edict_t* ent);
 void SP_viewthing (edict_t *ent);
 
 void SP_light (edict_t *self);
@@ -404,10 +404,12 @@ void ED_ParseField (char *key, char *value, edict_t *ent)
 				*(char **)(b+f->ofs) = ED_NewString (value);
 				break;
 			case F_VECTOR:
-				sscanf (value, "%f %f %f", &vec[0], &vec[1], &vec[2]);
-				((float *)(b+f->ofs))[0] = vec[0];
-				((float *)(b+f->ofs))[1] = vec[1];
-				((float *)(b+f->ofs))[2] = vec[2];
+				if (sscanf(value, "%f %f %f", &vec[0], &vec[1], &vec[2]) != 3) {
+					gi.dprintf("WARNING: Vector field incomplete in %s, map: %s, field: %s\n", __func__, level.mapname, f->name);
+				}
+				((float*)(b + f->ofs))[0] = vec[0];
+				((float*)(b + f->ofs))[1] = vec[1];
+				((float*)(b + f->ofs))[2] = vec[2];
 				break;
 			case F_INT:
 				*(int *)(b+f->ofs) = atoi(value);
@@ -459,7 +461,7 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 		if (!data)
 			gi.error ("ED_ParseEntity: EOF without closing brace");
 
-		strlcpy (keyname, com_token, sizeof(keyname));
+		Q_strncpyz (keyname, com_token, sizeof(keyname));
 		
 	// parse value	
 		com_token = COM_Parse (&data);
@@ -571,8 +573,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	memset (&level, 0, sizeof(level));
 	memset (g_edicts, 0, game.maxentities * sizeof (g_edicts[0]));
 
-	strlcpy (level.mapname, mapname, sizeof(level.mapname));
-	strlcpy (game.spawnpoint, spawnpoint, sizeof(game.spawnpoint));
+	Q_strncpyz (level.mapname, mapname, sizeof(level.mapname));
+	Q_strncpyz (game.spawnpoint, spawnpoint, sizeof(game.spawnpoint));
 
 	// set client fields on player ents
 	for (i=0 ; i<game.maxclients ; i++)
@@ -595,6 +597,12 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 			ent = g_edicts;
 		else
 			ent = G_Spawn ();
+
+		if (!ent) {
+			gi.error("%s failed parsing entities.\n", __func__);
+			abort(); //QW// Silence compiler
+		}
+
 		entities = ED_ParseEdict (entities, ent);
 
 		// yet another map hack
@@ -856,17 +864,17 @@ void SP_worldspawn (edict_t *ent)
 	SetItemNames ();
 
 	if (st.nextmap)
-		strlcpy (level.nextmap, st.nextmap, sizeof(level.nextmap));
+		Q_strncpyz (level.nextmap, st.nextmap, sizeof(level.nextmap));
 
 	// make some data visible to the server
 
 	if (ent->message && ent->message[0])
 	{
 		gi.configstring (CS_NAME, ent->message);
-		strlcpy (level.level_name, ent->message, sizeof(level.level_name));
+		Q_strncpyz (level.level_name, ent->message, sizeof(level.level_name));
 	}
 	else
-		strlcpy (level.level_name, level.mapname, sizeof(level.level_name));
+		Q_strncpyz (level.level_name, level.mapname, sizeof(level.level_name));
 
 	if (st.sky && st.sky[0])
 		gi.configstring (CS_SKY, st.sky);

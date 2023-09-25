@@ -18,7 +18,8 @@ You can add or remove addresses from the filter list with:
 addip <ip>
 removeip <ip>
 
-The ip address is specified in dot format, and any unspecified digits will match any value, so you can specify an entire class C network with "addip 192.246.40".
+The ip address is specified in dot format, and any unspecified digits will match any value, so you 
+can specify an entire class C network with "addip 192.246.40".
 
 Removeip will only remove an address specified exactly the same way.  You cannot addip a subnet, then removeip a single host.
 
@@ -26,7 +27,8 @@ listip
 Prints the current list of filters.
 
 writeip
-Dumps "addip <ip>" commands to listip.cfg so it can be execed at a later date.  The filter lists are not saved and restored by default, because I beleive it would cause too much confusion.
+Dumps "addip <ip>" commands to listip.cfg so it can be execed at a later date.  
+The filter lists are not saved and restored by default, because I beleive it would cause too much confusion.
 
 filterban <0 or 1>
 
@@ -223,47 +225,41 @@ void SVCmd_ListIP_f (void)
 }
 
 /*
-=================
-SV_WriteIP_f
-=================
+================ =
+sv writeip -	Write "addip <ip>" commands to listip.cfg for reloading or extending.
+================ =
 */
-void SVCmd_WriteIP_f (void)
+static void SVCmd_WriteIP_f(void)
 {
-	FILE	*f;
+	FILE* f;
 	char	name[MAX_OSPATH];
-	union
-	{
-		byte	b[4];
-		unsigned int	i;
-	} b;
+	byte	b[4] = { 0 };
 	int		i;
-	cvar_t	*game;
+	cvar_t	*gamedir;
 
-	game = gi.cvar("game", "", 0);
+	gamedir = gi.cvar("game", "", 0); //QW// game is set by engine in command line.
 
-	if (!*game->string)
-		snprintf (name, sizeof(name), "%s/listip.cfg", GAMEVERSION);
+	if (!*gamedir->string)
+		Com_sprintf(name, sizeof(name), "%s/listip.cfg", GAMEVERSION);
 	else
-		snprintf (name, sizeof(name), "%s/listip.cfg", game->string);
+		Com_sprintf(name, sizeof(name), "%s/listip.cfg", gamedir->string);
 
-	gi.cprintf (NULL, PRINT_HIGH, "Writing %s.\n", name);
-
-	f = fopen (name, "wb");
-	if (!f)
+	if ((f = fopen(name, "wb")) == NULL)
 	{
-		gi.cprintf (NULL, PRINT_HIGH, "Couldn't open %s\n", name);
+		gi.cprintf(NULL, PRINT_HIGH, "Couldn't open %s. %s\n", name, strerror(errno));
 		return;
 	}
-	
+
+	gi.cprintf(NULL, PRINT_HIGH, "Writing %s.\n", name);
 	fprintf(f, "set filterban %d\n", (int)filterban->value);
 
-	for (i=0 ; i<numipfilters ; i++)
+	for (i = 0; i < numipfilters; i++)
 	{
-		b.i = ipfilters[i].compare;
-		fprintf (f, "sv addip %i.%i.%i.%i\n", b.b[0], b.b[1], b.b[2], b.b[3]);
+		*(unsigned*)b = ipfilters[i].compare;
+		fprintf(f, "sv addip %i.%i.%i.%i\n", b[0], b[1], b[2], b[3]);
 	}
-	
-	fclose (f);
+
+	fclose(f);
 }
 
 /*

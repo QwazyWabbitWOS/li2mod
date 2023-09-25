@@ -11,7 +11,7 @@ static char *ClientTeam (edict_t *ent)
 	if (!ent->client)
 		return value;
 
-	strlcpy(value, Info_ValueForKey (ent->client->pers.userinfo, "skin"), sizeof(value));
+	Q_strncpyz(value, Info_ValueForKey (ent->client->pers.userinfo, "skin"), sizeof(value));
 	p = strchr(value, '/');
 	if (!p)
 		return value;
@@ -34,8 +34,8 @@ qboolean OnSameTeam (edict_t *ent1, edict_t *ent2)
 	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
 		return false;
 
-	strlcpy (ent1Team, ClientTeam (ent1), sizeof(ent1Team));
-	strlcpy (ent2Team, ClientTeam (ent2), sizeof(ent2Team));
+	Q_strncpyz (ent1Team, ClientTeam (ent1), sizeof(ent1Team));
+	Q_strncpyz (ent2Team, ClientTeam (ent2), sizeof(ent2Team));
 
 	if (strcmp(ent1Team, ent2Team) == 0)
 		return true;
@@ -692,27 +692,28 @@ Cmd_InvDrop_f
 */
 void Cmd_InvDrop_f (edict_t *ent)
 {
-	gitem_t		*it;
+	//gitem_t		*it;
 
 	//WF
 	return;
 	//WF
 
-	ValidateSelectedItem (ent);
+	//QW// Unreachable code
+	//ValidateSelectedItem (ent);
 
-	if (ent->client->pers.selected_item == -1)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "No item to drop.\n");
-		return;
-	}
+	//if (ent->client->pers.selected_item == -1)
+	//{
+	//	gi.cprintf (ent, PRINT_HIGH, "No item to drop.\n");
+	//	return;
+	//}
 
-	it = &itemlist[ent->client->pers.selected_item];
-	if (!it->drop)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Item is not dropable.\n");
-		return;
-	}
-	it->drop (ent, it);
+	//it = &itemlist[ent->client->pers.selected_item];
+	//if (!it->drop)
+	//{
+	//	gi.cprintf (ent, PRINT_HIGH, "Item is not dropable.\n");
+	//	return;
+	//}
+	//it->drop (ent, it);
 }
 
 /*
@@ -816,10 +817,10 @@ void Cmd_Players_f (edict_t *ent)
 			game.clients[index[i]].pers.netname);
 		if (strlen (small) + strlen(large) > sizeof(large) - 100 )
 		{	// can't print all of them in one packet
-			strlcat (large, "...\n", sizeof(large));
+			Q_strncatz(large, "...\n", sizeof(large));
 			break;
 		}
-		strlcat (large, small, sizeof(large));
+		Q_strncatz(large, small, sizeof(large));
 	}
 
 	gi.cprintf (ent, PRINT_HIGH, "%s\n%i players\n", large, count);
@@ -883,7 +884,8 @@ Cmd_Say_f
 */
 void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 {
-	int		i, j;
+	int		i;
+	int		j;
 	edict_t	*other;
 	char	*p;
 	char	text[2048];
@@ -907,9 +909,9 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 
 	if (arg0)
 	{
-		strlcat (text, gi.argv(0), sizeof(text));
-		strlcat (text, " ", sizeof(text));
-		strlcat (text, gi.args(), sizeof(text));
+		Q_strncatz (text, gi.argv(0), sizeof(text));
+		Q_strncatz (text, " ", sizeof(text));
+		Q_strncatz (text, gi.args(), sizeof(text));
 	}
 	else
 	{
@@ -920,14 +922,14 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 			p++;
 			p[strlen(p)-1] = 0;
 		}
-		strlcat(text, p, sizeof(text));
+		Q_strncatz(text, p, sizeof(text));
 	}
 
 	// don't let text be too long for malicious reasons
 	if (strlen(text) > 150)
 		text[150] = 0;
 
-	strlcat(text, "\n", sizeof(text));
+	Q_strncatz(text, "\n", sizeof(text));
 
 	if (flood_msgs->value) {
 		cl = ent->client;
@@ -938,17 +940,15 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
             return;
         }
         i = cl->flood_whenhead - flood_msgs->value + 1;
-        if (i < 0)
-            i = (sizeof(cl->flood_when)/sizeof(cl->flood_when[0])) + i;
-		if (cl->flood_when[i] && 
-			level.time - cl->flood_when[i] < flood_persecond->value) {
+		if (i < 0)
+            i = (int)(sizeof(cl->flood_when)/sizeof(cl->flood_when[0])) + i;
+
+		if (cl->flood_when[i] && level.time - cl->flood_when[i] < flood_persecond->value) {
 			cl->flood_locktill = level.time + flood_waitdelay->value;
-			gi.cprintf(ent, PRINT_CHAT, "Flood protection:  You can't talk for %d seconds.\n",
-				(int)flood_waitdelay->value);
+			gi.cprintf(ent, PRINT_CHAT, "Flood protection:  You can't talk for %d seconds.\n", (int)flood_waitdelay->value);
             return;
         }
-		cl->flood_whenhead = (cl->flood_whenhead + 1) %
-			(sizeof(cl->flood_when)/sizeof(cl->flood_when[0]));
+		cl->flood_whenhead = (cl->flood_whenhead + 1) % (int)(sizeof(cl->flood_when)/sizeof(cl->flood_when[0]));
 		cl->flood_when[cl->flood_whenhead] = level.time;
 	}
 
@@ -974,7 +974,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 void Cmd_PlayerList_f(edict_t *ent)
 {
 	int i;
-	char st[80];
+	char str[80];
 	char text[1400];
 	edict_t *e2;
 
@@ -984,19 +984,19 @@ void Cmd_PlayerList_f(edict_t *ent)
 		if (!e2->inuse)
 			continue;
 
-		Com_sprintf(st, sizeof(st), "%02d:%02d %4d %3d %s%s\n",
+		Com_sprintf(str, sizeof(str), "%02d:%02d %4d %3d %s%s\n",
 			(level.framenum - e2->client->resp.enterframe) / 600,
 			((level.framenum - e2->client->resp.enterframe) % 600)/10,
 			e2->client->ping,
 			e2->client->resp.score,
 			e2->client->pers.netname,
 			e2->client->resp.spectator ? " (spectator)" : "");
-		if (strlen(text) + strlen(st) > sizeof(text) - 50) {
+		if (strlen(text) + strlen(str) > sizeof(text) - 50) {
 			snprintf(text+strlen(text), sizeof(text)-strlen(text), "And more...\n");
 			gi.cprintf(ent, PRINT_HIGH, "%s", text);
 			return;
 		}
-		strlcat(text, st, sizeof(text));
+		Q_strncatz(text, str, sizeof(text));
 	}
 	gi.cprintf(ent, PRINT_HIGH, "%s", text);
 }

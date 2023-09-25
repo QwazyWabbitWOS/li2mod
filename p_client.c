@@ -1461,12 +1461,12 @@ void ClientUserinfoChanged2 (edict_t *ent, char *userinfo, unsigned int uilen)
 	// check for malformed or illegal info strings
 	if (!Info_Validate(userinfo))
 	{
-		strlcpy (userinfo, "\\name\\badinfo\\skin\\male/grunt", uilen);
+		Q_strncpyz (userinfo, "\\name\\badinfo\\skin\\male/grunt", uilen);
 	}
 
 	// set name
 	s = Info_ValueForKey (userinfo, "name");
-	strlcpy (ent->client->pers.netname, s, sizeof(ent->client->pers.netname));
+	Q_strncpyz (ent->client->pers.netname, s, sizeof(ent->client->pers.netname));
 
 	// set spectator
 	s = Info_ValueForKey (userinfo, "spectator");
@@ -1513,7 +1513,7 @@ void ClientUserinfoChanged2 (edict_t *ent, char *userinfo, unsigned int uilen)
 	}
 
 	// save off the userinfo in case we want to check something later
-	strlcpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo));
+	Q_strncpyz (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo));
 }
 
 void ClientUserinfoChanged (edict_t *ent, char *userinfo, unsigned int uilen) {
@@ -1608,7 +1608,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 //		gi.dprintf ("%s connected\n", ent->client->pers.netname);
 	{
 		char *c, ipstr[32];
-		strlcpy(ipstr, Info_ValueForKey(userinfo, "ip"), sizeof(ipstr));
+		Q_strncpyz(ipstr, Info_ValueForKey(userinfo, "ip"), sizeof(ipstr));
 		c = strchr(ipstr, ':');
 		if(c)
 			*c = 0;

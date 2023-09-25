@@ -20,10 +20,10 @@ size_t strlcpy_s(char *dest, char *src, size_t n, int count);
 #endif
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #define snprintf(b,s,f,...) _snprintf_s(b,s,_TRUNCATE,f,__VA_ARGS__)
 #define vsnprintf(b,s,f,...) vsnprintf_s(b,s,_TRUNCATE,f,__VA_ARGS__)
 //QW// Using G_CopyString instead
 // #define strdup(s) _strdup(s)
-#define stricmp(s1,s2) _stricmp(s1,s2)
+//#define stricmp(s1,s2) _stricmp(s1,s2)
 #endif

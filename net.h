@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <signal.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -36,7 +36,7 @@ int Net_Check(void);
 int Net_Lookup(char *host);
 int Net_Connect(int haddr, int port);
 int Net_IsConnect(int sock);
-int Net_Poll(SOCKET sock);
+//int Net_Poll(SOCKET sock);
 int Net_Send(int sock, char *buf);
 int Net_Sendf(int sock, char *format, ...);
 int Net_Recv(int sock, char *buf, int len);

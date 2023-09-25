@@ -370,11 +370,11 @@ int Rune_HasRegen(edict_t *player) {
 void Rune_RemoveAll(void) {
 	edict_t *ent;
 
-	while((ent = G_Find(NULL, FOFS(classname), "rune")))
+	while((ent = G_Find(NULL, FOFS(classname), "rune")) != NULL)
 		G_FreeEdict(ent);
 
 	ent = NULL;
-	while((ent = G_Find(ent, FOFS(classname), "player")))
+	while((ent = G_Find(ent, FOFS(classname), "player")) != NULL)
 		ent->rune = 0;
 }
 
@@ -404,15 +404,15 @@ qboolean Rune_Give(edict_t *ent, char *name) {
 
 void CTFSay_Team_Rune(edict_t *who, char *buf, unsigned int buflen) {
 	if(who->rune & RUNE_RESIST)
-		strlcpy(buf, "the Resist rune", buflen);
+		Q_strncpyz(buf, "the Resist rune", buflen);
 	else if(who->rune & RUNE_STRENGTH)
-		strlcpy(buf, "the Strength rune", buflen);
+		Q_strncpyz(buf, "the Strength rune", buflen);
 	else if(who->rune & RUNE_HASTE)
-		strlcpy(buf, "the Haste rune", buflen);
+		Q_strncpyz(buf, "the Haste rune", buflen);
 	else if(who->rune & RUNE_REGEN)
-		strlcpy(buf, "the Regen rune", buflen);
+		Q_strncpyz(buf, "the Regen rune", buflen);
 	else if(who->rune & RUNE_VAMPIRE)
-		strlcpy(buf, "the Vampire rune", buflen);
+		Q_strncpyz(buf, "the Vampire rune", buflen);
 	else
-		strlcpy(buf, "no rune", buflen);
+		Q_strncpyz(buf, "no rune", buflen);
 }

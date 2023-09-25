@@ -87,7 +87,7 @@ void lmaster_lookup(void) {
 	}
 
 	net_addr = Net_Lookup(lmaster->string);
-	net_port = lmaster_port->value;
+	net_port = (int)lmaster_port->value;
 	if(net_addr == -1)
 		gi.dprintf("*** Bad lmaster hostname\n");
 }
@@ -176,7 +176,7 @@ void LNet_RunFrame(void) {
 			gi.dprintf("*** Connected to lmaster server (%d.%d.%d.%d:%d)\n",
 				net_addr & 0xFF, (net_addr & 0xFF00) >> 8, (net_addr & 0xFF0000) >> 16, (net_addr & 0xFF000000) >> 24, net_port);
 			net_talk = 1;
-			net_time = level.time;
+			net_time = (int)level.time;
 		}
 
 		else if(level.time > net_trytime + RETRY_WAIT) {
@@ -299,7 +299,7 @@ void LNet_Recv(char *buf) {
 			ent = g_edicts + 1 + i;
 			if(!ent->inuse)
 				continue;
-			if(ent->lclient->chan_id && !stricmp(chan, ent->lclient->chan))
+			if(ent->lclient->chan_id && !Q_stricmp(chan, ent->lclient->chan))
 				gi.cprintf(ent, 4, "*** %s has disconnected\n", name);
 		}
 	}
@@ -449,12 +449,12 @@ void LNet_Recv(char *buf) {
 	}
 
 	else if(!strcmp(cmd, "statall")) {
-		edict_t *ent;
+		edict_t *e;
 		for(i = 0; i < game.maxclients; i++) {
-			ent = g_edicts + 1 + i;
-			if(!ent->inuse)
+			e = g_edicts + 1 + i;
+			if(!e->inuse)
 				continue;
-			LNet_ReturnStat(ent);
+			LNet_ReturnStat(e);
 		}
 	}
 
@@ -603,14 +603,14 @@ qboolean LNet_ClientCommand(edict_t *ent) {
 			gi.cprintf(ent, 4, "*** Need to specify a channel name\n");
 			return true;
 		}
-		strlcpy(ent->lclient->chan, gi.argv(1), sizeof(ent->lclient->chan));
+		Q_strncpyz(ent->lclient->chan, gi.argv(1), sizeof(ent->lclient->chan));
 		Net_Sendf(net_sock, "join" DELIM "%d" DELIM "%s", ent->lclient->id, gi.argv(1));
 	}
 	else if(!Q_stricmp(cmd, ".leave") || !Q_stricmp(cmd, ".l")) {
 		if(ent->lclient->chan_id) {
 			Net_Sendf(net_sock, "leave" DELIM "%d" DELIM "*", ent->lclient->id);
 			ent->lclient->chan_id = 0;
-			strlcpy(ent->lclient->chan, "", sizeof(ent->lclient->chan));
+			Q_strncpyz(ent->lclient->chan, "", sizeof(ent->lclient->chan));
 		}
 		else
 			gi.cprintf(ent, 4, "*** You are not in a channel\n");
@@ -627,7 +627,7 @@ qboolean LNet_ClientCommand(edict_t *ent) {
 		if(strlen(gi.args()))
 			snprintf(buf, sizeof(buf), "%s %s", gi.argv(0), gi.args());
 		else
-			strlcpy(buf, gi.argv(0), sizeof(buf));
+			Q_strncpyz(buf, gi.argv(0), sizeof(buf));
 		Net_Sendf(net_sock, "cmd" DELIM "%d" DELIM "%s", ent->lclient->id, buf);
 	}
 	else if(ent->lclient->chan_id) {
@@ -635,7 +635,7 @@ qboolean LNet_ClientCommand(edict_t *ent) {
 		if(strlen(gi.args()))
 			snprintf(buf, sizeof(buf), "%s %s", gi.argv(0), gi.args());
 		else
-			strlcpy(buf, gi.argv(0), sizeof(buf));
+			Q_strncpyz(buf, gi.argv(0), sizeof(buf));
 		Net_Sendf(net_sock, "chat" DELIM "%d" DELIM "%s", ent->lclient->id, buf);
 	}
 	else

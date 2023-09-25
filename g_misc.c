@@ -43,9 +43,9 @@ void VelocityForDamage (int damage, vec3_t v)
 	v[2] = 200.0 + 100.0 * random();
 
 	if (damage < 50)
-		VectorScale (v, 0.7, v);
+		VectorScale (v, 0.7f, v);
 	else 
-		VectorScale (v, 1.2, v);
+		VectorScale (v, 1.2f, v);
 }
 
 void ClipGibVelocity (edict_t *ent)
@@ -1584,10 +1584,10 @@ void target_string_use (edict_t *self, edict_t *other, edict_t *activator)
 {
 	edict_t *e;
 	int		n;
-	size_t	l;
+	int		l;
 	char	c;
 
-	l = strlen(self->message);
+	l = (int)strlen(self->message);
 	for (e = self->teammaster; e; e = e->teamchain)
 	{
 		if (!e->count)
