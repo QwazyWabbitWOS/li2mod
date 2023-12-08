@@ -390,7 +390,7 @@ vec_t VectorNormalize (vec3_t v)
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrt (length);		// FIXME
+	length = sqrtf (length);
 
 	if (length)
 	{
@@ -409,7 +409,7 @@ vec_t VectorNormalize2 (vec3_t v, vec3_t out)
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrt (length);		// FIXME
+	length = sqrtf (length);
 
 	if (length)
 	{
@@ -1070,7 +1070,7 @@ void Info_RemoveKey (char *s, char *key)
 	char	value[512];
 	char	*o;
 	char	*buf;
-	int	buflen;
+	size_t	buflen;
 
 	if (strstr (key, "\\"))
 	{
@@ -1078,7 +1078,7 @@ void Info_RemoveKey (char *s, char *key)
 		return;
 	}
 
-	buflen = (int)strlen(s)+1;
+	buflen = strlen(s)+1;
 	buf = calloc(1, buflen);
 	if (!buf)
 		return;

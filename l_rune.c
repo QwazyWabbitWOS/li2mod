@@ -57,6 +57,7 @@ lvar_t *rune_vampire_sound;
 int rune_count[NUM_RUNES] = { 0, 0, 0, 0, 0 };
 int rune_total = 0;
 
+static int Rune_IsInSolid(edict_t *ent); //QW//
 void UseRunesChanged(void) {
 	if(!use_runes->value)
 		Rune_RemoveAll();
@@ -216,6 +217,12 @@ edict_t *Rune_Spawn(vec3_t origin, int type) {
 
 	gi.linkentity(rune);
 
+//	gi.dprintf("Rune 0x%x type %i spawned, time %.1f\n", rune, rune->rune, level.time);
+
+	//QW// if rune is in solid, remove it on next think
+	if (Rune_IsInSolid(rune))
+		rune->nextthink = level.time + 0.1f;
+	
 	return rune;
 }
 
@@ -268,11 +275,13 @@ void Rune_Touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 
 void Rune_Remove(edict_t *self) {
 	int i;
-	for(i = 0; i < NUM_RUNES; i++)
+	for(i = 0; i < NUM_RUNES; i++) {
 		if(self->rune & 1 << i) {
 			rune_count[i]--;
 			rune_total--;
 		}
+	}
+//	gi.dprintf("Rune 0x%x type %i removed, time %.1f\n", self, self->rune, level.time);
 	G_FreeEdict(self);
 }
 
@@ -359,6 +368,9 @@ void Rune_ClientFrame(edict_t *player) {
 	}
 }
 
+static int Rune_IsInSolid(edict_t *ent) {
+	return gi.pointcontents(ent->s.origin) & CONTENTS_SOLID;
+}
 int Rune_HasHaste(edict_t *player) {
 	return player->rune & RUNE_HASTE;
 }

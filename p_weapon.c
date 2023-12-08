@@ -605,9 +605,9 @@ GRENADE
 ======================================================================
 */
 
-#define GRENADE_TIMER		3.0
-#define GRENADE_MINSPEED	400
-#define GRENADE_MAXSPEED	800
+#define GRENADE_TIMER		3.0f
+#define GRENADE_MINSPEED	400.0f
+#define GRENADE_MAXSPEED	800.0f
 
 void weapon_grenade_fire (edict_t *ent, qboolean held)
 {

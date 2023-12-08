@@ -126,6 +126,10 @@ void Highscores_Update(void) {
 
 		if(!new_place) {
 			new_place = (place_t *)gi.TagMalloc(sizeof(place_t), TAG_LEVEL);
+			if (!new_place) {
+				gi.error("Allocation failed in %s\n", __func__);
+				return;
+			}
 			new_place->prev = place;
 			new_place->next = NULL;
 
