@@ -32,24 +32,21 @@ void Menu_Create(edict_t *ent, int startline, int endline) {
 		Menu_Destroy(ent);
 
 	ent->menu = (menu_t *)malloc(sizeof(menu_t));
-	if (ent->menu)
-	{
-		ent->menu->firstline = NULL;
-		ent->menu->lastline = NULL;
-		ent->menu->sel = NULL;
-		ent->menu->startline = startline;
-		ent->menu->endline = endline;
-		ent->menu->page = 0;
-		ent->menu->changed = true;
-		ent->menu->editing = false;
-		ent->menu->cancel_func = NULL;
-		ent->menu->xoff = 15;
-		ent->menu->yoff = 16;
+	if (!ent->menu) {
+		gi.error("Allocation failed in %s\n", __func__);
+		return;
 	}
-	else
-	{
-		gi.dprintf("%s: allocation failed.\n", __func__);
-	}
+	ent->menu->firstline = NULL;
+	ent->menu->lastline = NULL;
+	ent->menu->sel = NULL;
+	ent->menu->startline = startline;
+	ent->menu->endline = endline;
+	ent->menu->page = 0;
+	ent->menu->changed = true;
+	ent->menu->editing = false;
+	ent->menu->cancel_func = NULL;
+	ent->menu->xoff = 15;
+	ent->menu->yoff = 16;
 
 	Lithium_LayoutOn(ent, LAYOUT_MENU);
 	Lithium_LayoutOff(ent, LAYOUT_SCORES);
@@ -69,30 +66,32 @@ void Menu_AddLine(edict_t *ent, int type, int line, char *text, void *data) {
 	menuline_t *menuline;
 
 	menuline = (menuline_t *)malloc(sizeof(menuline_t));
-	if (menuline)
-	{
-		menuline->prev = NULL;
-		menuline->next = NULL;
+	if (!menuline) {
+		gi.error("Allocation failed in %s\n", __func__);
+		return;
+	}
+	menuline->prev = NULL;
+	menuline->next = NULL;
 
-		if (!ent->menu->firstline) {
-			ent->menu->firstline = menuline;
-			ent->menu->lastline = menuline;
-		}
-		else {
-			menuline->prev = ent->menu->lastline;
-			ent->menu->lastline->next = menuline;
-			ent->menu->lastline = menuline;
-		}
+	if(!ent->menu->firstline) {
+		ent->menu->firstline = menuline;
+		ent->menu->lastline = menuline;
+	}
+	else {
+		menuline->prev = ent->menu->lastline;
+		ent->menu->lastline->next = menuline;
+		ent->menu->lastline = menuline;
+	}
 
-		menuline->type = type;
-		menuline->line = line;
-		menuline->text = text;
-		menuline->data = data;
-		menuline->selectable = type != MENU_TEXT;
-		menuline->textp = false;
+	menuline->type = type;
+	menuline->line = line;
+	menuline->text = text;
+	menuline->data = data;
+	menuline->selectable = type != MENU_TEXT;
+	menuline->textp = false;
+
 	if(!ent->menu->sel && menuline->selectable)
 		ent->menu->sel = menuline;
-	}
 }
 
 void Menu_AddText(edict_t *ent, int line, char *format, ...) {
@@ -428,12 +427,12 @@ void Menu_NextPage(edict_t *ent) {
 
 int countfields(char *edit) {
 	char *c = edit;
-	int f = 0;
+	int count = 0;
 	while(c) {
 		c = strchr(c + 1, ':');
-		f++;
+		count++;
 	}
-	return f;
+	return count;
 }
 
 void Menu_Use(edict_t *ent) {

@@ -31,7 +31,7 @@ lvar_t *lvar(char *name, char *string, char *edit, int cat) {
 	lvar_t *lvar = (lvar_t *)malloc(sizeof(lvar_t));
 	if (!lvar)
 	{
-		gi.error("malloc failed in lvar()\n");
+		gi.error("Allocation failed in %s\n", __func__);
 		abort();
 	}
 	
