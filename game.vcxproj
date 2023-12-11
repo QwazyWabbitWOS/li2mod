@@ -95,7 +95,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
-      <AssemblerOutput>All</AssemblerOutput>
+      <AssemblerOutput>NoListing</AssemblerOutput>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -139,7 +139,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
-      <AssemblerOutput>All</AssemblerOutput>
+      <AssemblerOutput>NoListing</AssemblerOutput>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -178,15 +178,12 @@
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeaderOutputFile>.\Release/game.pch</PrecompiledHeaderOutputFile>
-      <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
-      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
-      <AssemblerOutput>All</AssemblerOutput>
+      <AssemblerOutput>NoListing</AssemblerOutput>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -206,7 +203,7 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <GenerateDebugInformation />
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -224,12 +221,11 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
-      <AssemblerOutput>All</AssemblerOutput>
+      <AssemblerOutput>NoListing</AssemblerOutput>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
