@@ -1742,21 +1742,6 @@ char* file_gamedir(char* name) {
 	return file_gamedir_buffer;
 }
 
-//char *file_gamedir(char *name) {
-	//char gdir[MAX_OSPATH];
-
-	//if(strchr(name, '/') || strchr(name, '\\'))
-	//	Q_strncpyz(file_gamedir_buffer, name, sizeof(file_gamedir_buffer));
-	//else {
-	//	Q_strncpyz(gdir, gi.cvar("gamedir", "", 0)->string, sizeof(gdir));
-	//	if(!strlen(gdir))
-	//		Q_strncpyz(gdir, "baseq2", sizeof(gdir));
-	//	Com_sprintf(file_gamedir_buffer, sizeof(file_gamedir_buffer), "%s/%s", gdir, name);
-	//}
-
-	//return file_gamedir_buffer;
-//}
-
 qboolean file_exist(char *name) {
 	FILE *file;
 	if(!name)
