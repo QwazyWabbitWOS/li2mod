@@ -61,7 +61,7 @@ lithium/game$(ARCH).$(SHLIBEXT): $(GAME_OBJS)
 all:
 	$(MAKE) clean
 	$(MAKE) depend
-	$(MAKE)
+	$(MAKE) -j
 
 clean:
 	rm -f $(GAME_OBJS)

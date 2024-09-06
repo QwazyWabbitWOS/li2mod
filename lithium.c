@@ -1719,10 +1719,10 @@ char* file_gamedir(char* name) {
 	}
 	else {
 		cvar_t* basedir = gi.cvar("basedir", NULL, 0);
-		cvar_t* gamedir = gi.cvar("game", NULL, 0);
-		if (basedir && gamedir) {
+		cvar_t* my_gamedir = gi.cvar("game", NULL, 0);
+		if (basedir && my_gamedir) {
 			Com_sprintf(gdir, sizeof(file_gamedir_buffer),
-				"%s/%s", basedir->string, gamedir->string);
+				"%s/%s", basedir->string, my_gamedir->string);
 			len = strlen(gdir);
 		}
 		else {
