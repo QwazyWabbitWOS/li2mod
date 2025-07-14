@@ -1,78 +1,88 @@
 #
-# Quake2 gamei386.so Makefile for Linux
+# Quake2 Makefile for Linux
 #
 
+.DEFAULT_GOAL := game
+
 # this nice line comes from the linux kernel makefile
-ARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/ -e s/alpha/axp/)
+ARCH := $(shell uname -m | sed -e s/i.86/i386/ \
+	-e s/sun4u/sparc64/ -e s/arm.*/arm/ \
+	-e s/sa110/arm/ -e s/alpha/axp/)
+# On 64-bit OS use the command: setarch i386 make all
+# to obtain the 32-bit binary DLL on 64-bit Linux.
 CC = gcc -std=c11 -Wall
 
+# on x64 machines do this preparation:
+# sudo apt-get install ia32-libs
+# sudo apt-get install libc6-dev-i386
+# On Ubuntu 16.x and higher use sudo apt install libc6-dev-i386
+# this will let you build 32-bits on ia64 systems
+#
 # This is for native build
-CFLAGS = -O3 -DARCH="$(ARCH)"
+CFLAGS=-O3 -DARCH="$(ARCH)" -DSTDC_HEADERS
 # This is for 32-bit build on 64-bit host
 ifeq ($(ARCH), i386)
-CFLAGS += -m32 -DSTDC_HEADERS -I/usr/include
+CFLAGS += -m32 -I/usr/include
 endif
 
+# flavors of Linux
 ifeq ($(shell uname),Linux)
-#CFLAGS+=-DNEED_STRLCPY
+CFLAGS += -DLINUX
+LIBTOOL = ldd
 endif
 
-# This enables warnings if a strlcat or strlcpy would have
-# caused an overflow.
-#CFLAGS+=-DSTRL_DEBUG
+# OS X wants to be Linux and FreeBSD too.
+ifeq ($(shell uname),Darwin)
+CFLAGS += -DLINUX
+LIBTOOL = otool
+endif
 
-# This causes a backtrace to be emitted for detected buffer overflows
-# Works only on linux
-#CFLAGS+=-DSTRL_DEBUG_BACKTRACE -rdynamic
-
-LDFLAGS=-ldl -lm
 SHLIBEXT=so
+
+#set position independent code
 SHLIBCFLAGS=-fPIC
-SHLIBLDFLAGS=-shared
 
-DO_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+# Build directory
+BUILD_DIR = build$(ARCH)
+# Ensure build directory exists
 
-#############################################################################
-# SETUP AND BUILD
-# GAME
-#############################################################################
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-.c.o:
-	$(DO_CC)
+# List of source files
+GAME_SRCS = \
+	p_client.c g_cmds.c g_combat.c g_func.c g_items.c \
+	g_main.c g_misc.c g_phys.c g_save.c g_spawn.c \
+	g_target.c g_trigger.c g_turret.c g_utils.c g_weapon.c m_move.c \
+	p_hud.c p_trail.c p_view.c p_weapon.c q_shared.c g_svcmds.c g_chase.c \
+	lithium.c l_display.c l_fragtrak.c l_gslog.c l_hook.c \
+	l_mapqueue.c l_nocamp.c l_obit.c l_pack.c l_rune.c \
+	l_var.c l_menu.c l_admin.c l_vote.c l_net.c net.c \
+	g_ctf.c l_hscore.c zbotcheck.c strl.c
 
-GAME_OBJS = \
-	p_client.o g_cmds.o g_combat.o g_func.o g_items.o \
-	g_main.o g_misc.o g_phys.o g_save.o g_spawn.o \
-	g_target.o g_trigger.o g_turret.o g_utils.o g_weapon.o m_move.o \
-	p_hud.o p_trail.o p_view.o p_weapon.o q_shared.o g_svcmds.o g_chase.o \
-	lithium.o l_display.o l_fragtrak.o l_gslog.o l_hook.o \
-	l_mapqueue.o l_nocamp.o l_obit.o l_pack.o l_rune.o \
-	l_var.o l_menu.o l_admin.o l_vote.o l_net.o net.o \
-	g_ctf.o l_hscore.o zbotcheck.o strl.o
+GAME_OBJS = $(GAME_SRCS:%.c=$(BUILD_DIR)/%.o)
+# Pattern rule to place objects in build directory
+$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(SHLIBCFLAGS) -MMD -MP -MF $(@:.o=.d) -o $@ -c $<
 
-lithium/game$(ARCH).$(SHLIBEXT): $(GAME_OBJS) 
-	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(GAME_OBJS) $(LDFLAGS)
+-include $(GAME_OBJS:.o=.d)
 
+# Build all object files that are out-of-date
+game: $(GAME_OBJS) game$(ARCH).real.$(SHLIBEXT)
 
-#############################################################################
-# MISC
-#############################################################################
+# Main target: depends on all object files
+game$(ARCH).real.$(SHLIBEXT) : $(GAME_OBJS)
+	$(CC) $(CFLAGS) -shared -o $@ $(GAME_OBJS) -ldl -lm
+	$(LIBTOOL) -r $@
+	file $@
 
+# Build everything (always rebuild all objects and the shared library)
 all:
 	$(MAKE) clean
-	$(MAKE) depend
-	$(MAKE) -j
+	$(MAKE) $(BUILD_DIR)
+	$(MAKE) $(GAME_OBJS)
+	$(MAKE) game$(ARCH).real.$(SHLIBEXT)
+
 
 clean:
-	rm -f $(GAME_OBJS)
-
-depend:
-	gcc -MM $(GAME_OBJS:.o=.c) > dependencies
-
-#############################################################################
-# DEPENDENCIES
-#############################################################################
-
-# Automatically maintain dependencies by running make all or make depend.
-
--include dependencies
+	rm -rf $(BUILD_DIR)
