@@ -74,7 +74,7 @@ void NoCamp_ClientThink(edict_t *ent, usercmd_t *ucmd) {
 	if(level.time < client->decamp_time) {
 		if(client->decamp_count) {
 			if(client->decamp_count < 4 && client->decamp_fire && (ucmd->forwardmove || ucmd->sidemove))
-				if(ent->centerprint && strlen(ent->centerprint))
+				if(strlen(ent->centerprint))
 					centerprintf(ent, "");
 
 			if(ucmd->buttons & BUTTON_ATTACK)
@@ -88,9 +88,9 @@ void NoCamp_ClientThink(edict_t *ent, usercmd_t *ucmd) {
 	//last_num = client->decamp_num;
 
 	client->decamp_move[client->decamp_num] = 
-		abs(ent->s.origin[0] - client->decamp_vec[0]) +
-		abs(ent->s.origin[1] - client->decamp_vec[1]) +
-		abs(ent->s.origin[2] - client->decamp_vec[2]);
+		fabsf(ent->s.origin[0] - client->decamp_vec[0]) +
+		fabsf(ent->s.origin[1] - client->decamp_vec[1]) +
+		fabsf(ent->s.origin[2] - client->decamp_vec[2]);
 
 	client->decamp_vec[0] = ent->s.origin[0];
 	client->decamp_vec[1] = ent->s.origin[1];
@@ -115,14 +115,13 @@ void NoCamp_ClientThink(edict_t *ent, usercmd_t *ucmd) {
 	}
 
 	if(!client->decamp_fire || ent->layout & (LAYOUT_SCORES | LAYOUT_MOTD | LAYOUT_MENU)) {
-		if(!client->decamp_count)
+		if (!client->decamp_count)
 			client->decamp_count++;
-		return;
 	}
 
-	sec = camp_warn->value - client->decamp_count / 2 + 2;
+	sec = (int)(camp_warn->value - (float)client->decamp_count / 2 + 2);
 	if(sec >= 0 && sec <= camp_warn->value && client->decamp_count > 3)
-		centerprintf(ent, "         No camping.  Get moving.         \n         %d seconds to comply.         \n", sec);
+		centerprintf(ent, "         No camping.  Get moving.         \n           %d seconds to comply.        \n", sec);
 
 	if(client->decamp_count > camp_warn->value * 2 + 5) {
 		centerprintf(ent, "Killed for camping.");

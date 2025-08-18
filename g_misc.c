@@ -117,7 +117,7 @@ void ThrowGib (edict_t *self, char *gibname, int damage, int type)
 {
 	edict_t *gib;
 	vec3_t	vd;
-	vec3_t	origin;
+	vec3_t	origin = { 0 };
 	vec3_t	size;
 	float	vscale;
 
@@ -267,7 +267,7 @@ void debris_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 void ThrowDebris (edict_t *self, char *modelname, float speed, vec3_t origin)
 {
 	edict_t	*chunk;
-	vec3_t	v;
+	vec3_t	v = { 0 };
 
 	chunk = G_Spawn();
 	VectorCopy (origin, chunk->s.origin);
@@ -343,7 +343,7 @@ Pathtarget: gets used when an entity that has
 
 void path_corner_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	vec3_t		v;
+	vec3_t		v = { 0 };
 	edict_t		*next;
 
 	if (other->movetarget != self)
@@ -746,8 +746,8 @@ one small chunk per 25 of mass (up to 16).  So 800 gives the most.
 */
 void func_explosive_explode (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
-	vec3_t	origin;
-	vec3_t	chunkorigin;
+	vec3_t	origin = { 0 };
+	vec3_t	chunkorigin = { 0 };
 	vec3_t	size;
 	int		count;
 	int		mass;
@@ -876,7 +876,7 @@ void barrel_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *s
 
 {
 	float	ratio;
-	vec3_t	v;
+	vec3_t	v = { 0 };
 
 	if ((!other->groundentity) || (other->groundentity == self))
 		return;
@@ -888,9 +888,9 @@ void barrel_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *s
 
 void barrel_explode (edict_t *self)
 {
-	vec3_t	org;
+	vec3_t	org = { 0 };
 	float	spd;
-	vec3_t	save;
+	vec3_t	save = { 0 };
 
 	T_RadiusDamage (self, self->activator, self->dmg, NULL, self->dmg+40, MOD_BARREL);
 
@@ -898,7 +898,7 @@ void barrel_explode (edict_t *self)
 	VectorMA (self->absmin, 0.5, self->size, self->s.origin);
 
 	// a few big chunks
-	spd = 1.5 * (float)self->dmg / 200.0;
+	spd = 1.5f * (float)self->dmg / 200.0f;
 	org[0] = self->s.origin[0] + crandom() * self->size[0];
 	org[1] = self->s.origin[1] + crandom() * self->size[1];
 	org[2] = self->s.origin[2] + crandom() * self->size[2];
@@ -909,7 +909,7 @@ void barrel_explode (edict_t *self)
 	ThrowDebris (self, "models/objects/debris1/tris.md2", spd, org);
 
 	// bottom corners
-	spd = 1.75 * (float)self->dmg / 200.0;
+	spd = 1.75f * (float)self->dmg / 200.0f;
 	VectorCopy (self->absmin, org);
 	ThrowDebris (self, "models/objects/debris3/tris.md2", spd, org);
 	VectorCopy (self->absmin, org);
@@ -924,7 +924,7 @@ void barrel_explode (edict_t *self)
 	ThrowDebris (self, "models/objects/debris3/tris.md2", spd, org);
 
 	// a bunch of little chunks
-	spd = 2 * self->dmg / 200;
+	spd = 2.0f * self->dmg / 200.0f;
 	org[0] = self->s.origin[0] + crandom() * self->size[0];
 	org[1] = self->s.origin[1] + crandom() * self->size[1];
 	org[2] = self->s.origin[2] + crandom() * self->size[2];

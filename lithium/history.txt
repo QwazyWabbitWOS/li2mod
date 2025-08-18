@@ -1,6 +1,32 @@
 
 Lithium II Mod release history.  I miss some things some times.  -WhiteFang
 
+v1.33 - Aug 2025
+----------------------------------------------------------------------------
+QwazyWabbit
+This is updated for VS2022 and the Makefile has been streamlined for Linux.
+Refactored the Makefile. New technique builds the .so files in the source directory but
+puts the .o and .d in folders per the architecture being built. Game binary for the arch is placed
+in the lithium folder with the default configs.
+Makefile uses gcc and ISO C11 but can be modified to use clang and C17.
+Changes made for compatibility with enhanced q2 servers and clean compilation.
+Touched up initialization of local variables throughout.
+Use float to float operations like fabsf or ceilf.
+Handle return value from sscanf calls. Clean up some lint spotted by clang.
+Use gi.TagMalloc/TagFree for menu allocations vs malloc. TODO: perhaps do this for lvars someday.
+Restore call to LNet_InitGame. There might be a Lithium master server again one day...
+The use_lmaster cvar is zero in the default configs anyway.
+Replaced strlcat and strlcpy functions with equivalent Q_strncatz & Q_strncpyz functions in qshared.c.
+Removed strl.c & strl.h from the build. Retained the files for archival purposes.
+Q_strcasecmp and strcasecmp are replaced by Q_stricmp.
+Q_tolower is inline, allowing the compiler to optimize the operation
+originally performed in Q_strncasecmp.
+Refactored Lithium_InitGame around determining the version number of the server.
+Matt went to a lot of trouble to set qver to account for engine versions after 3.19
+so I preserved that functionality and it sets qver = 3.20 for advanced servers
+like q2pro that don't follow the 3.xx format in their version strings.
+The discovered version information is printed after the module startup banner.
+
 v1.31 - Sep 2010
 ----------------------------------------------------------------------------
 added, source repository to github at http://github.com/WhiteFang34/li2mod

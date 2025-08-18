@@ -12,8 +12,6 @@
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"baseq2"
 
-#define MOD_VERSION "1.33"
-
 #ifndef _DEBUG
 #define BUILD	"Release"
 #else
@@ -1035,9 +1033,6 @@ struct gclient_s
 //WF
 typedef struct pvar_s pvar_t;
 typedef struct lclient_s lclient_t;
-#ifndef _WIN32
-	#define stricmp Q_strcasecmp
-#endif
 //WF
 
 struct edict_s

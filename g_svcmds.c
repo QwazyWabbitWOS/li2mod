@@ -32,9 +32,11 @@ The filter lists are not saved and restored by default, because I beleive it wou
 
 filterban <0 or 1>
 
-If 1 (the default), then ip addresses matching the current list will be prohibited from entering the game.  This is the default setting.
+If 1 (the default), then ip addresses matching the current list will be prohibited from entering the game.
+This is the default setting.
 
-If 0, then only addresses matching the list will be allowed.  This lets you easily set up a private game, or a game that only allows players from your local network.
+If 0, then only addresses matching the list will be allowed.
+This lets you easily set up a private game, or a game that only allows players from your local network.
 
 
 ==============================================================================
@@ -233,7 +235,11 @@ static void SVCmd_WriteIP_f(void)
 {
 	FILE* f;
 	char	name[MAX_OSPATH];
-	byte	b[4] = { 0 };
+	union
+	{
+		byte	b[4];
+		unsigned int	i;
+	} b;
 	int		i;
 	cvar_t	*gamedir;
 
@@ -244,7 +250,10 @@ static void SVCmd_WriteIP_f(void)
 	else
 		Com_sprintf(name, sizeof(name), "%s/listip.cfg", gamedir->string);
 
-	if ((f = fopen(name, "wb")) == NULL)
+	gi.cprintf (NULL, PRINT_HIGH, "Writing %s.\n", name);
+
+	f = fopen (name, "wb");
+	if (!f)
 	{
 		gi.cprintf(NULL, PRINT_HIGH, "Couldn't open %s. %s\n", name, strerror(errno));
 		return;
@@ -255,8 +264,8 @@ static void SVCmd_WriteIP_f(void)
 
 	for (i = 0; i < numipfilters; i++)
 	{
-		*(unsigned*)b = ipfilters[i].compare;
-		fprintf(f, "sv addip %i.%i.%i.%i\n", b[0], b[1], b[2], b[3]);
+		b.i = ipfilters[i].compare;
+		fprintf (f, "sv addip %i.%i.%i.%i\n", b.b[0], b.b[1], b.b[2], b.b[3]);
 	}
 
 	fclose(f);

@@ -248,7 +248,7 @@ void Admin_MapW(edict_t *ent);
 qboolean Admin_ClientCommand(edict_t *ent);
 
 // l_mod.c
-void Mod_InitGame(void);
+//void Mod_InitGame(void);
 
 // l_misc.c
 void wf_strlwr(char *str);
@@ -263,9 +263,9 @@ int strip(char *str);
 void Rune_InitGame(void);
 void Rune_InitLevel(void);
 void Rune_RunFrame(void);
-char *Rune_GetName(int type);
+//char *Rune_GetName(int type);
 void Rune_Reset(void);
-void Rune_MaybeSpawn(vec3_t origin);
+//void Rune_MaybeSpawn(vec3_t origin);
 edict_t *Rune_Spawn(vec3_t origin, int type);
 void Rune_Touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf);
 void Rune_Remove(edict_t *self);
@@ -343,8 +343,8 @@ void Menu_Destroy(edict_t *ent);
 int Menu_Update(edict_t *ent);
 void Menu_Prev(edict_t *ent);
 void Menu_Next(edict_t *ent);
-void Menu_PrevPage(edict_t *ent);
-void Menu_NextPage(edict_t *ent);
+//void Menu_PrevPage(edict_t *ent);
+//void Menu_NextPage(edict_t *ent);
 void Menu_Use(edict_t *ent);
 void Menu_Key(edict_t *ent, int key);
 void Menu_EditBegin(edict_t *ent);
@@ -357,19 +357,19 @@ qboolean Menu_ClientCommand(edict_t *ent);
 qboolean Var_SpawnEntity(edict_t *ent);
 
 // l_team.c
-void Team_ClientThink(edict_t *ent);
-void Team_Set(edict_t *ent, int team_num);
-void Team_Cmd(edict_t *ent, char *str);
+//void Team_ClientThink(edict_t *ent);
+//void Team_Set(edict_t *ent, int team_num);
+//void Team_Cmd(edict_t *ent, char *str);
 
 // other
-void Observer_Cmd(edict_t *ent, char *cmd);
+//void Observer_Cmd(edict_t *ent, char *cmd);
 void Armor_Realize(gitem_armor_t *armor_info, char *string);
 void StatusBar_UpdateAll(void);
 int StatusBar_Update(edict_t *ent);
 int Layout_Update(edict_t *ent);
 int FasterRespawn(edict_t *ent, float delay);
 void Weapon_PickBest(edict_t *ent, edict_t *other);
-void Scores_Cmd(edict_t *ent, char *cmd);
+//void Scores_Cmd(edict_t *ent, char *cmd);
 qboolean ChaseFind(edict_t *ent, int place, int searchdir);
 void ChaseStart(edict_t *ent);
 void UpdateChaseCam(edict_t *ent);
@@ -478,7 +478,7 @@ extern lvar_t *knockback_adjust;
 extern lvar_t *knockback_self;
 
 extern lvar_t *motd;
-extern lvar_t *news_file;
+extern lvar_t *news;
 extern lvar_t *news_time;
 extern lvar_t *banlist;
 

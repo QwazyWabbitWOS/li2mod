@@ -54,7 +54,7 @@ void P_DamageFeedback (edict_t *player)
 	gclient_t	*client;
 	float	side;
 	float	realcount, count, kick;
-	vec3_t	v;
+	vec3_t	v = { 0 };
 	int		r, l;
 	static	vec3_t	power_color = {0.0, 1.0, 0.0};
 	static	vec3_t	acolor = {1.0, 1.0, 1.0};
@@ -206,7 +206,7 @@ void SV_CalcViewOffset (edict_t *ent)
 	float		bob;
 	float		ratio;
 	float		delta;
-	vec3_t		v;
+	vec3_t		v = { 0 };
 
 
 //===================================
@@ -285,7 +285,7 @@ void SV_CalcViewOffset (edict_t *ent)
 	ratio = (ent->client->fall_time - level.time) / FALL_TIME;
 	if (ratio < 0)
 		ratio = 0;
-	v[2] -= ratio * ent->client->fall_value * 0.4;
+	v[2] -= ratio * ent->client->fall_value * 0.4f;
 
 	// add bob height
 
@@ -399,7 +399,7 @@ SV_CalcBlend
 void SV_CalcBlend (edict_t *ent)
 {
 	int		contents;
-	vec3_t	vieworg;
+	vec3_t	vieworg = { 0 };
 	int		remaining;
 
 	ent->client->ps.blend[0] = ent->client->ps.blend[1] = 
@@ -483,7 +483,7 @@ void P_FallingDamage (edict_t *ent)
 {
 	float	delta;
 	int		damage;
-	vec3_t	dir;
+	vec3_t	dir = { 0 };
 
 	if (ent->s.modelindex != 255)
 		return;		// not in the player model
@@ -1045,7 +1045,7 @@ void ClientEndServerFrame (edict_t *ent)
 	// calculate speed and cycle to be used for
 	// all cyclic walking effects
 	//
-	xyspeed = sqrt(ent->velocity[0]*ent->velocity[0] + ent->velocity[1]*ent->velocity[1]);
+	xyspeed = sqrtf(ent->velocity[0]*ent->velocity[0] + ent->velocity[1]*ent->velocity[1]);
 
 	if (xyspeed < 5)
 	{

@@ -40,12 +40,12 @@ static int	quad_drop_timeout_hack;
 GetItemByIndex
 ===============
 */
-gitem_t	*GetItemByIndex (int index)
+gitem_t* GetItemByIndex(int index)
 {
 	if (index == 0 || index >= game.num_items)
 		return NULL;
-
-	return &itemlist[index];
+	else
+		return &itemlist[index];
 }
 
 
@@ -100,19 +100,23 @@ gitem_t	*FindItem (char *pickup_name)
 void DoRespawn (edict_t *ent)
 {
 	if (!ent)
+	{
+		gi.dprintf("NULL ent passed to %s\n", __func__);
 		return;
-
+	}
 	if (ent->team)
 	{
 		edict_t	*master;
-		int	count;
-		int choice;
+		unsigned	count;
+		unsigned	choice;
 
 		master = ent->teammaster;
+		if (master == NULL)
+			return;
 
-//ZOID
-//in ctf, when we are weapons stay, only the master of a team of weapons
-//is spawned
+		//ZOID
+		//in ctf, when we are weapons stay, only the master of a team of weapons
+		//is spawned
 		if (ctf->value &&
 			((int)dmflags->value & DF_WEAPONS_STAY) &&
 			master->item && (master->item->flags & IT_WEAPON))
@@ -1078,7 +1082,7 @@ void PrecacheItem (gitem_t *it)
 			PrecacheItem (ammo);
 	}
 
-	// parse the space seperated precache string for other items
+	// parse the space separated precache string for other items
 	s = it->precaches;
 	if (!s || !s[0])
 		return;
@@ -1089,11 +1093,11 @@ void PrecacheItem (gitem_t *it)
 		while (*s && *s != ' ')
 			s++;
 
-		len = s-start;
-		if (len >= MAX_QPATH || len < 5)
+		len = s - start;
+		if (len >= MAX_QPATH - 1 || len < 5)
 			gi.error ("PrecacheItem: %s has bad precache string", it->classname);
 		memcpy (data, start, len);
-		data[len - 1] = 0;
+		data[len] = 0;
 		if (*s)
 			s++;
 

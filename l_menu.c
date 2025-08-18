@@ -31,7 +31,7 @@ void Menu_Create(edict_t *ent, int startline, int endline) {
 	if(ent->menu)
 		Menu_Destroy(ent);
 
-	ent->menu = (menu_t *)malloc(sizeof(menu_t));
+	ent->menu = (menu_t *)gi.TagMalloc(sizeof(menu_t), TAG_LEVEL);
 	if (!ent->menu) {
 		gi.error("Allocation failed in %s\n", __func__);
 		return;
@@ -65,7 +65,7 @@ void Menu_Title(edict_t *ent, char *title) {
 void Menu_AddLine(edict_t *ent, int type, int line, char *text, void *data) {
 	menuline_t *menuline;
 
-	menuline = (menuline_t *)malloc(sizeof(menuline_t));
+	menuline = (menuline_t *)gi.TagMalloc(sizeof(menuline_t), TAG_LEVEL);
 	if (!menuline) {
 		gi.error("Allocation failed in %s\n", __func__);
 		return;
@@ -123,11 +123,11 @@ void Menu_Destroy(edict_t *ent) {
 	while(menuline) {
 		next = menuline->next;
 		if(menuline->textp)
-			free(menuline->text);
-		free(menuline);
+			gi.TagFree(menuline->text);
+		gi.TagFree(menuline);
 		menuline = next;
 	}
-	free(ent->menu);
+	gi.TagFree(ent->menu);
 	ent->menu = NULL;
 
 	Lithium_LayoutOff(ent, LAYOUT_MENU);
@@ -435,9 +435,11 @@ int countfields(char *edit) {
 	return count;
 }
 
+typedef void (*menu_func_t)(edict_t* ent);
+
 void Menu_Use(edict_t *ent) {
 	menuline_t *menuline;
-	void (*func)(edict_t *ent);
+	menu_func_t func;
 	lvar_t *lvar;
 	pvar_t *pvar;
 
@@ -474,8 +476,10 @@ void Menu_Use(edict_t *ent) {
 			}
 			break;
 		case MENU_FUNC:
-			func = menuline->data;
-			func(ent);
+			func = (menu_func_t)menuline->data;
+			if (func) {
+				func(ent);
+			}
 			break;
 		case MENU_CMD:
 			stuffcmd(ent, menuline->data);

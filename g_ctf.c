@@ -1424,7 +1424,8 @@ void CTFWeapon_Grapple (edict_t *ent)
 
 void CTFTeam_f (edict_t *ent)
 {
-	char *t, *s;
+	char* t = "";
+	char* s = "";
 	int desired_team;
 
 	t = gi.args();

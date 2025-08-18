@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="g_chase.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_combat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_ctf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_phys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_save.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_spawn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_svcmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_target.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_trigger.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_turret.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="g_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_admin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_display.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_fragtrak.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_gslog.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_hook.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_hscore.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_mapqueue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_menu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_net.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_nocamp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_obit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_pack.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_rune.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_var.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_vote.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lithium.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="m_move.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="net.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="p_client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="p_hud.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="p_trail.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="p_view.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="p_weapon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="q_shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zbotcheck.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="g_ctf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="g_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lithium.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="net.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="q_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fragtrak.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{50843785-4848-42f0-87c2-6a1ba8766fbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{f8b9493c-180b-4518-843a-da371da98d5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{39e825b6-7caa-4217-bddc-454de7039c5d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="game.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Makefile" />
+    <None Include="README" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="lithium\history.txt" />
+  </ItemGroup>
+</Project>

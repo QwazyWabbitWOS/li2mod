@@ -26,7 +26,6 @@
 #include <string.h>
 #include <ctype.h>
 #include "net.h"
-#include "strl.h"
 
 size_t Q_strncpyz(char* dst, const char* src, size_t dstSize);
 
@@ -68,7 +67,7 @@ int Net_Init(void) {
 	signal(SIGPIPE, sigpipe);
 #endif
 
-	recvbuf[0] = (char *)malloc(BUF_LEN + BUF_OVERFLOW);
+	recvbuf[0] = malloc(BUF_LEN + BUF_OVERFLOW);
 	recvpos[0] = NULL;
 
 	return 1;
@@ -88,7 +87,7 @@ void Net_Exit(void) {
 // this does a little more than set non-blocking now...
 int Net_SetNonBlocking(SOCKET sock) {
 	static int argp = 1;
-	struct linger l;
+	struct linger l = { 0 };
 	l.l_onoff = 0;
 	l.l_linger = 0;
 	setsockopt(sock, SOL_SOCKET, SO_LINGER, (char *)&l, sizeof(l));
@@ -113,7 +112,7 @@ int Net_Listen(int port) {
 
 	for(i = 0; i < MAX_LISTEN; i++) {
 		if(i)
-			recvbuf[i] = (char *)malloc(BUF_LEN + BUF_OVERFLOW);
+			recvbuf[i] = malloc(BUF_LEN + BUF_OVERFLOW);
 		recvpos[i] = NULL;
 		rsock[i] = 0;
 	}
@@ -252,7 +251,7 @@ int Net_Recv(int sock, char *buf, int len) {
 
 	if(ssock)
 		for(i = 0; i < MAX_LISTEN; i++)
-			if(sock == rsock[i])
+			if(sock == (int)rsock[i])
 				break;
 
 	if(!recvpos[i])
@@ -364,7 +363,7 @@ char *Net_GetAddrStr(int sock) {
 	static char ip[64];
 
 	for(i = 0; i < MAX_LISTEN; i++) {
-		if(sock == rsock[i]) {
+		if(sock == (int)rsock[i]) {
 			haddr = ntohl(raddr[i].sin_addr.s_addr);
 			snprintf(ip, sizeof(ip), "%d.%d.%d.%d", (haddr >> 24) & 0xff, (haddr >> 16) & 0xff, (haddr >> 8) & 0xff, haddr & 0xff);
 			return ip;

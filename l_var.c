@@ -62,7 +62,7 @@ lvar_t *lvar(char *name, char *string, char *edit, int cat) {
 extern lvar_t *use_runes, *use_hook, *use_nocamp, *use_mapvote, *use_highscores, *use_zbotkick;
 
 void Var_SetFeatures(void) {
-	char features[256] = "";
+	char features[256] = { 0 };
 	
 	if(use_runes->value) Q_strncatz(features, "Runes, ", sizeof(features));
 	if(use_hook->value) Q_strncatz(features, "Hook, ", sizeof(features));

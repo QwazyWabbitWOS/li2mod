@@ -95,7 +95,8 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
-      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerOutput>All</AssemblerOutput>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -139,7 +140,8 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
-      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerOutput>All</AssemblerOutput>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -184,6 +186,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
       <AssemblerOutput>NoListing</AssemblerOutput>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -201,7 +204,6 @@
       </RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
@@ -226,6 +228,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
       <AssemblerOutput>NoListing</AssemblerOutput>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -497,7 +500,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="strl.c" />
     <ClCompile Include="zbotcheck.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -513,11 +515,14 @@
     <ClInclude Include="fragtrak.h" />
     <ClInclude Include="lithium.h" />
     <ClInclude Include="net.h" />
-    <ClInclude Include="strl.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="game.def" />
     <None Include="Makefile" />
+    <None Include="README" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="lithium\history.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

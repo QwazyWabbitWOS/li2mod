@@ -51,7 +51,7 @@ qboolean fire_hit (edict_t *self, vec3_t aim, int damage, int kick)
 	vec3_t		v;
 	vec3_t		point;
 	float		range;
-	vec3_t		dir;
+	vec3_t		dir = { 0 };
 
 	//see if enemy is in range
 	VectorSubtract (self->enemy->s.origin, self->s.origin, dir);
@@ -123,7 +123,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 	vec3_t		end;
 	float		r;
 	float		u;
-	vec3_t		water_start;
+	vec3_t		water_start = { 0 };
 	qboolean	water = false;
 	int			content_mask = MASK_SHOT | MASK_WATER;
 
@@ -391,8 +391,8 @@ static void Grenade_Explode (edict_t *ent)
 	if (ent->enemy)
 	{
 		float	points;
-		vec3_t	v;
-		vec3_t	dir;
+		vec3_t	v = { 0 };
+		vec3_t	dir = { 0 };
 
 		VectorAdd (ent->enemy->mins, ent->enemy->maxs, v);
 		VectorMA (ent->enemy->s.origin, 0.5, v, v);
@@ -622,7 +622,7 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
 	rocket->owner = self;
 	rocket->touch = rocket_touch;
-	rocket->nextthink = level.time + 8000/speed;
+	rocket->nextthink = level.time + 8000.0f/speed;
 	rocket->think = G_FreeEdict;
 	rocket->dmg = damage;
 	rocket->radius_dmg = radius_damage;
@@ -644,7 +644,7 @@ fire_rail
 */
 void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
 {
-	vec3_t		from;
+	vec3_t		from = { 0 };
 	vec3_t		end;
 	trace_t		tr;
 	edict_t		*ignore;
@@ -714,7 +714,7 @@ void bfg_explode (edict_t *self)
 {
 	edict_t	*ent;
 	float	points;
-	vec3_t	v;
+	vec3_t	v = { 0 };
 	float	dist;
 
 	if (self->s.frame == 0)
@@ -804,8 +804,8 @@ void bfg_think (edict_t *self)
 	edict_t	*ent;
 	edict_t	*ignore;
 	vec3_t	point;
-	vec3_t	dir;
-	vec3_t	start;
+	vec3_t	dir = { 0 };
+	vec3_t	start = { 0 };
 	vec3_t	end;
 	int		dmg;
 	trace_t	tr;
@@ -908,7 +908,7 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 	bfg->s.modelindex = gi.modelindex ("sprites/s_bfg1.sp2");
 	bfg->owner = self;
 	bfg->touch = bfg_touch;
-	bfg->nextthink = level.time + 8000/speed;
+	bfg->nextthink = level.time + 8000.0f/speed;
 	bfg->think = G_FreeEdict;
 	bfg->radius_dmg = damage;
 	bfg->dmg_radius = damage_radius;

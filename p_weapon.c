@@ -19,7 +19,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held);
 //WF
 void P_ProjectSource (gclient_t *client, vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result)
 {
-	vec3_t	_distance;
+	vec3_t	_distance = { 0 };
 
 	VectorCopy (distance, _distance);
 	if (client->pers.hand == LEFT_HANDED)
@@ -611,7 +611,7 @@ GRENADE
 
 void weapon_grenade_fire (edict_t *ent, qboolean held)
 {
-	vec3_t	offset;
+	vec3_t	offset = { 0 };
 	vec3_t	forward, right;
 	vec3_t	start;
 	//WF
@@ -780,7 +780,7 @@ GRENADE LAUNCHER
 
 void weapon_grenadelauncher_fire (edict_t *ent)
 {
-	vec3_t	offset;
+	vec3_t	offset = { 0 };
 	vec3_t	forward, right;
 	vec3_t	start;
 	int		damage = 120;
@@ -830,7 +830,7 @@ ROCKET
 
 void Weapon_RocketLauncher_Fire (edict_t *ent)
 {
-	vec3_t	offset, start;
+	vec3_t	offset = { 0 }, start;
 	vec3_t	forward, right;
 	int		damage;
 	float	damage_radius;
@@ -900,7 +900,7 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 {
 	vec3_t	forward, right;
 	vec3_t	start;
-	vec3_t	offset;
+	vec3_t	offset = { 0 };
 
 	if (is_quad)
 		damage *= 4;
@@ -963,7 +963,7 @@ void Weapon_Blaster (edict_t *ent)
 void Weapon_HyperBlaster_Fire (edict_t *ent)
 {
 	float	rotation;
-	vec3_t	offset;
+	vec3_t	offset = { 0 };
 	int		effect;
 	//int		damage;
 
@@ -988,7 +988,7 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 		{
 			//WF
 //			rotation = (ent->client->ps.gunframe - 5) * 2*M_PI/6;
-			rotation = (ent->client->ps.gunframe - 5 + rotation_adjust) * 2*M_PI/6;
+			rotation = (ent->client->ps.gunframe - 5.0 + rotation_adjust) * 2 * M_PI / 6;
 			//WF
 			offset[0] = -4 * sin(rotation);
 			offset[1] = 0;
@@ -1057,13 +1057,13 @@ void Machinegun_Fire (edict_t *ent)
 	int	i;
 	vec3_t		start;
 	vec3_t		forward, right;
-	vec3_t		angles;
+	vec3_t		angles = { 0 };
 	//WF
 //	int			damage = 8;
 	int			damage = machinegun_damage->value;
 	//WF
 	int			kick = 2;
-	vec3_t		offset;
+	vec3_t		offset = { 0 };
 
 	if (!(ent->client->buttons & BUTTON_ATTACK))
 	{
@@ -1159,7 +1159,7 @@ void Chaingun_Fire (edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right, up;
 	float		r, u;
-	vec3_t		offset;
+	vec3_t		offset = { 0 };
 	int			damage;
 	int			kick = 2;
 
@@ -1298,7 +1298,7 @@ void weapon_shotgun_fire (edict_t *ent)
 {
 	vec3_t		start;
 	vec3_t		forward, right;
-	vec3_t		offset;
+	vec3_t		offset = { 0 };
 	//WF
 //	int			damage = 4;
 	int			damage = shotgun_damage->value;
@@ -1361,8 +1361,8 @@ void weapon_supershotgun_fire (edict_t *ent)
 {
 	vec3_t		start;
 	vec3_t		forward, right;
-	vec3_t		offset;
-	vec3_t		v;
+	vec3_t		offset = { 0 };
+	vec3_t		v = { 0 };
 	//WF
 //	int			damage = 6;
 	int			damage = sshotgun_damage->value;
@@ -1433,7 +1433,7 @@ void weapon_railgun_fire (edict_t *ent)
 {
 	vec3_t		start;
 	vec3_t		forward, right;
-	vec3_t		offset;
+	vec3_t		offset = { 0 };
 	int			damage;
 	int			kick;
 
@@ -1499,7 +1499,7 @@ BFG10K
 
 void weapon_bfg_fire (edict_t *ent)
 {
-	vec3_t	offset, start;
+	vec3_t	offset = { 0 }, start;
 	vec3_t	forward, right;
 	int		damage;
 	//WF

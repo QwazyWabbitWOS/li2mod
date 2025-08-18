@@ -113,11 +113,16 @@ qboolean Admin_Validate(edict_t *ent) {
 			}
 
 			c++;
-			sscanf(c, "%s %d %s", ipmask, &access, admpassword);
+			if (sscanf(c, "%s %d %s", ipmask, &access, admpassword) != 3) {
+				gi.dprintf("%s line %d %s's admin information was not fully parsed.\n", __func__, __LINE__, username);
+			}
 		}
 		else {
 			Q_strncpyz(username, "*", sizeof(username));
-			sscanf(buf, "%s %d %s", ipmask, &access, admpassword);
+			
+			if (sscanf(buf, "%s %d %s", ipmask, &access, admpassword) != 3) {
+				gi.dprintf("%s line %d %s's admin information was not fully parsed.\n", __func__, __LINE__, username);
+			}
 		}
 
 		IP_Scan(ipmask, ip);
@@ -333,7 +338,7 @@ void Admin_Kick(edict_t *ent) {
 		cl_ent = g_edicts + 1 + i;
 		if(cl_ent->inuse && cl_ent->client) {
 			static char cmd[MAX_CLIENTS][8];
-			Com_sprintf(cmd[i], sizeof(cmd[i]), "_ak %d", i);
+			Com_sprintf(cmd[i], sizeof(cmd[i]), "_ak %hd", i); //QW// use short int here
 			Menu_AddLine(ent, MENU_CMD, 0, cl_ent->client->pers.netname, cmd[i]);
 		}
 	}
@@ -450,7 +455,7 @@ void Admin_Ban(edict_t *ent) {
 	char arg[256];
 	FILE *file;
 	int i, bans = 0, del = -1, add = 0;
-	char ban[MAX_BANS][32];
+	char ban[MAX_BANS][32] = { 0 };
 	char *c, buf[256];
 
 	if(ent && !Admin_Access(ent, admin_ban))
@@ -499,7 +504,7 @@ void Admin_Ban(edict_t *ent) {
 		bans++;
 		add = 1;
 	}
-	else if(!Q_stricmp(cmd, "delete") || !stricmp(cmd, "del")) {
+	else if(!Q_stricmp(cmd, "delete") || !Q_stricmp(cmd, "del")) {
 		for(i = 0; i < bans; i++) {
 			Q_strncpyz(buf, ban[i], sizeof(buf));
 			c = strchr(buf, ' ');

@@ -1,11 +1,12 @@
 	
 // q_shared.h -- included first by ALL program modules
+#pragma once
 
 #ifdef _WIN32
 #pragma warning(disable : 4100)	// C4100 unreferenced formal parameter
 #pragma warning(disable : 4152)	// C4152: nonstandard extension, function/data pointer conversion in expression
 #pragma warning(disable : 4244)	// C4244 conversion from 'type1' to 'type2', possible loss of data
-#pragma warning(disable : 4996)	// disable warnings from VS 2010 about deprecated CRT functions (_CRT_SECURE_NO_WARNINGS).
+//#pragma warning(disable : 4996)	// disable warnings from VS 2010 about deprecated CRT functions (_CRT_SECURE_NO_WARNINGS).
 #endif
 
 #include <assert.h>
@@ -20,16 +21,8 @@
 #include <limits.h>
 #include <errno.h>
 
-#include "strl.h"
-
 typedef unsigned char 		byte;
 typedef enum {false, true}	qboolean;
-
-
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
-
 
 // angle indexes
 #define	PITCH				0		// up / down
@@ -53,7 +46,7 @@ typedef enum {false, true}	qboolean;
 #define	MAX_SOUNDS			256		// so they cannot be blindly increased
 #define	MAX_IMAGES			256
 #define	MAX_ITEMS			256
-#define MAX_GENERAL			(MAX_CLIENTS*2)	// general config strings
+#define MAX_GENERAL			(MAX_CLIENTS * 2)	// general config strings
 
 
 // game print flags
@@ -205,10 +198,7 @@ inline int Q_tolower(int c)
 	return c;
 }
 
-// portable case insensitive compare
-int Q_stricmp (char *s1, char *s2);
-int Q_strcasecmp (char *s1, char *s2);
-int Q_strncasecmp (char *s1, char *s2, int n);
+int Q_stricmp(const char* s1, const char* s2);
 size_t Q_strncpyz(char* dst, const char* src, size_t dstSize);
 size_t Q_strncatz(char* dst, const char* src, size_t dstSize);
 

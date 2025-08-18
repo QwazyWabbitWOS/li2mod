@@ -72,7 +72,7 @@ edict_t *findradius (edict_t *from, vec3_t org, float rad)
 		if (from->solid == SOLID_NOT)
 			continue;
 		for (j=0 ; j<3 ; j++)
-			eorg[j] = org[j] - (from->s.origin[j] + (from->mins[j] + from->maxs[j])*0.5);
+			eorg[j] = org[j] - (from->s.origin[j] + (from->mins[j] + from->maxs[j])*0.5f);
 		if (VectorLength(eorg) > rad)
 			continue;
 		return from;
@@ -408,7 +408,7 @@ edict_t *G_Spawn (void)
 	{
 		// the first couple seconds of server time can involve a lot of
 		// freeing and allocating, so relax the replacement policy
-		if (!e->inuse && ( e->freetime < 2 || level.time - e->freetime > 0.5 ) )
+		if (!e->inuse && ( e->freetime < 2.0f || level.time - e->freetime > 0.5f ) )
 		{
 			G_InitEdict (e);
 			return e;

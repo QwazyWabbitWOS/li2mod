@@ -24,11 +24,11 @@
 
 #include "g_local.h"
 
-float lithium_ver = 1.32f;
+float lithium_ver = 1.33f; //QW Not sure why this is float and not a #define
 int lithium_beta = 2;
 
-char lithium_version[16];
-char lithium_modname[48];
+char lithium_version[16]; //QW// Used in 'ver' user command and in lithium_modname.
+char lithium_modname[48]; //QW Used in menues and copied to 'gamename' cvar.
 static char file_gamedir_buffer[256];
 
 lvar_t *use_safety;
@@ -72,7 +72,7 @@ lvar_t *ofp_minping;
 lvar_t *ofp_maxping;
 
 lvar_t *motd;
-lvar_t *news_file;
+lvar_t *news;
 lvar_t *news_time;
 lvar_t *banlist;
 
@@ -95,7 +95,16 @@ void Lithium_InitGame(void) {
 
 	Com_sprintf(lithium_modname, sizeof(lithium_modname), "Lithium II Mod v%s", lithium_version);
 
-	sscanf(gi.cvar("version", 0, 0)->string, "%f", &qver);
+	//QW// All this to decide whether to use RF_SHELL_DOUBLE introduced by rogue in v3.19
+	// and we don't even know if the connecting client will actually render it.
+	cvar_t* version = gi.cvar("version", 0, 0); //QW make engine version known to dll
+	gi.dprintf("%s detected %s\n", __func__, version->string);
+	if (!sscanf(version->string, "%f", &qver)) {
+		if (strstr(version->string, "q2pro") || strstr(version->string, "r1q2")) {
+			qver = 3.20f; //QW Just assert version 3.20 when using advanced servers.
+			gi.dprintf("%s is setting qver = %1.2f for internal engine version number.\n", __func__, qver);
+		}
+	}
 
 	ofp_base = lvar("ofp_base", "20", "##", VAR_NONE);
 	ofp_perplayer = lvar("ofp_perplayer", "0.75", "#.##", VAR_NONE);
@@ -151,7 +160,7 @@ void Lithium_InitGame(void) {
 	max_rate = lvar("max_rate", "8000", "#####", VAR_OTHER);
 
 	motd = lvar("motd", "motd.txt", "str", VAR_NONE);
-	news_file = lvar("news", "news.txt", "str", VAR_NONE);
+	news = lvar("news", "news.txt", "str", VAR_NONE);
 	news_time = lvar("news_time", "10", "str", VAR_NONE);
 	banlist = lvar("banlist", "admin.lst", "str", VAR_NONE);
 
@@ -164,7 +173,7 @@ void Lithium_InitGame(void) {
 	Hook_InitGame();
 	Vote_InitGame();
 
-//	LNet_InitGame();	//QW// For Lithium.com master servers
+	LNet_InitGame();	//QW// For Lithium.com master servers
 
 	// must be last for features var
 	Var_InitGame();
@@ -349,11 +358,11 @@ char *GetNews(void);
 void News_RunFrame(void) {
 	static float news_check_time = 0;
 	static char oldnews[1024] = "";
-	char *news;
+	char *newstext;
 
 	if(level.time > news_check_time) {
-		news = GetNews();
-		if(Q_strcasecmp(news, oldnews)) {
+		newstext = GetNews();
+		if(Q_stricmp(newstext, oldnews)) {
 			int i;
 			edict_t *ent;
 
@@ -365,7 +374,7 @@ void News_RunFrame(void) {
 				ent->news_time = level.time + news_time->value;
 			}
 
-			Q_strncpyz(oldnews, news, sizeof(oldnews));
+			Q_strncpyz(oldnews, newstext, sizeof(oldnews));
 		}
 		news_check_time = level.time + 30;
 	}
@@ -428,7 +437,7 @@ qboolean IP_Match(int ip1[4], int ip2[4]) {
 // IP banning
 qboolean Lithium_ClientConnect(edict_t *ent, char *userinfo) {
 	char *c, *ipstr;
-	int i, ip[4], cip[4], ban[4], port, max, count;
+	int i, ip[4] = { 0 }, cip[4] = { 0 }, ban[4], port, max, count;
 	FILE *file;
 	char buf[256];
 	edict_t *cl_ent;
@@ -437,8 +446,9 @@ qboolean Lithium_ClientConnect(edict_t *ent, char *userinfo) {
 	file = fopen(file_gamedir(banlist->string), "rt");
 	if(file) {
 		ipstr = Info_ValueForKey(userinfo, "ip");
-		sscanf(ipstr, "%d.%d.%d.%d:%d", &ip[0], &ip[1], &ip[2], &ip[3], &port);
-
+		if(sscanf(ipstr, "%d.%d.%d.%d:%d", &ip[0], &ip[1], &ip[2], &ip[3], &port) != 5) {
+			gi.dprintf("%s %d client userinfo ip information incomplete.\n", __func__, __LINE__);
+		}
 		while(fgets(buf, 256, file)) {
 			if(buf[0] == '/' && buf[1] == '/')
 				continue;
@@ -472,7 +482,9 @@ qboolean Lithium_ClientConnect(edict_t *ent, char *userinfo) {
 					if(!cl_ent->client->pers.connected || cl_ent == ent)
 						continue;
 					ipstr = Info_ValueForKey(cl_ent->client->pers.userinfo, "ip");
-					sscanf(ipstr, "%d.%d.%d.%d:%d", &cip[0], &cip[1], &cip[2], &cip[3], &port);
+					if(sscanf(ipstr, "%d.%d.%d.%d:%d", &cip[0], &cip[1], &cip[2], &cip[3], &port) != 5) {
+						gi.dprintf("%s %d client userinfo ip information incomplete.\n", __func__, __LINE__);
+					}
 					if(IP_Match(cip, ban))
 						count++;
 				}
@@ -507,8 +519,11 @@ void Lithium_ClientBegin(edict_t *ent) {
 	ent->lclient->ping_last = level.time;
 	ent->lclient->board_show = def_boardshow->value;
 
-	sscanf(Info_ValueForKey(ent->client->pers.userinfo, "ip"), "%d.%d.%d.%d:%d",
+	int result = sscanf(Info_ValueForKey(ent->client->pers.userinfo, "ip"), "%d.%d.%d.%d:%d",
 		&ent->lclient->ip[0], &ent->lclient->ip[1], &ent->lclient->ip[2], &ent->lclient->ip[3], &ent->lclient->port);
+	if (result < 5) {
+		gi.dprintf("%s client userinfo ip information incomplete.\n", __func__);
+	}
 
 	ent->lithium_flags = 0;
 	ent->layout = 0;
@@ -1069,7 +1084,7 @@ void Lithium_ClientEndFrame(edict_t *ent) {
 		return;
 
 	if(level.framenum - ent->update_frame > ofp_maxframes->value ||
-			(level.framenum - ent->update_frame) * 500000 /
+			(level.framenum - ent->update_frame) * 500000.0f /
 			(ofp_base->value + countplayers() * (int)ofp_perplayer->value) + 1 >
 			(ent->update_size + ent->update_other) * 
 			MIN(MAX(ent->lclient->ping, ofp_minping->value), ofp_maxping->value)) {
@@ -1128,8 +1143,11 @@ void Lithium_DoUpgrade(void) {
 }
 
 void Armor_Realize(gitem_armor_t *armor_info, char *string) {
-	sscanf(string, "%d %d %f %f", &armor_info->base_count, &armor_info->max_count,
+	int res = sscanf(string, "%d %d %f %f", &armor_info->base_count, &armor_info->max_count,
 		&armor_info->normal_protection, &armor_info->energy_protection);
+	if (res != 4) {
+		gi.dprintf("%s client armor_info information incomplete.\n", __func__);
+	}
 }
 
 // take time from respawn delay
@@ -1323,10 +1341,10 @@ edict_t *fph_sorted_ent[MAX_CLIENTS];
 void Lithium_CalcPlaces(void) {
 	int i, j, k;
 	int score, total;
-	int sorted[MAX_CLIENTS];
-	int sortedscores[MAX_CLIENTS];
-	int fph_sorted[MAX_CLIENTS];
-	int fph_sortedscores[MAX_CLIENTS];
+	int sorted[MAX_CLIENTS] = { 0 };
+	int sortedscores[MAX_CLIENTS] = { 0 };
+	int fph_sorted[MAX_CLIENTS] = { 0 };
+	int fph_sortedscores[MAX_CLIENTS] = { 0 };
 	edict_t *ent;
 	int score1, score2;
 
@@ -1542,12 +1560,13 @@ void ChasePrev(edict_t *ent) {
 }
 
 // from CTF2
-void UpdateChaseCam(edict_t *ent) {
-	vec3_t o, ownerv, goal;
+void UpdateChaseCam(edict_t *ent) 
+{
+	vec3_t o, ownerv = { 0 }, goal = { 0 };
 	edict_t *targ;
 	vec3_t forward;
 	trace_t trace;
-	vec3_t angles;
+	vec3_t angles = { 0 };
 
 	targ = ent->client->chase_target;
 
@@ -1647,7 +1666,7 @@ static qboolean loc_CanSee (edict_t *targ, edict_t *inflictor)
 	trace_t	trace;
 	vec3_t	targpoints[8];
 	int i;
-	vec3_t viewpoint;
+	vec3_t viewpoint = { 0 };
 
 // bmodels need special checking because their origin is 0,0,0
 	if (targ->movetype == MOVETYPE_PUSH)
@@ -1668,11 +1687,13 @@ static qboolean loc_CanSee (edict_t *targ, edict_t *inflictor)
 }
 
 void CTFSetIDView(edict_t *ent) {
-	vec3_t	forward, dir;
+	vec3_t	forward, dir = { 0 };
 	edict_t	*who, *best;
 	float bd = 0, d;
 	int i;
 
+	if (!ent)
+		return;
 	if(ent->id_ent && level.framenum & 1)
 		return;
 
@@ -1697,7 +1718,7 @@ void CTFSetIDView(edict_t *ent) {
 	if(best == ent || best == ent->client->chase_target || (best && best->deadflag == DEAD_DEAD))
 		best = NULL;
 
-	if(ent && ent->id_ent != best) {
+	if(ent->id_ent != best) {
 		ent->id_ent = best;
 		if(ent->layout & (LAYOUT_CENTERPRINT | LAYOUT_CHASECAM | LAYOUT_ID))
 			ent->layout_update = true;
@@ -1756,19 +1777,19 @@ qboolean file_exist(char *name) {
 }
 
 // removing beginning and trailing whitespaces
-void String_Crop(char *str) {
+static void String_Crop(char *str) {
 	char *c;
-	int l;
+	size_t len;
 
-	l = (int)strlen(str)+1;
-	c = gi.TagMalloc(l, TAG_GAME);
+	len = strlen(str)+1;
+	c = gi.TagMalloc((int)len, TAG_GAME);
 	if (!c)
 		return;
-	Q_strncpyz(c, str, l);
+	Q_strncpyz(c, str, len);
 
 	while(*c != '\0' && (*c == ' ' || *c == '\t'))
 		c++;
-	Q_strncpyz(str, c, l);
+	Q_strncpyz(str, c, len);
 	gi.TagFree(c);
 
 	c = str + (int)strlen(str) - 1;
@@ -1805,9 +1826,6 @@ void centerprintf(edict_t *ent, char *format, ...) {
 
 	char old[1000];
 
-	if(!ent->centerprint)
-		return;
-
 	if(!strlen(format)) {
 		Q_strncpyz(ent->centerprint, "", sizeof(ent->centerprint));
 		Lithium_LayoutOff(ent, LAYOUT_CENTERPRINT);
@@ -1830,9 +1848,6 @@ void centerprintf2(edict_t *ent, char *format, ...) {
 	va_list argptr;
 
 	char old[1000];
-
-	if(!ent->centerprint2)
-		return;
 
 	if(!strlen(format)) {
 		Q_strncpyz(ent->centerprint2, "", sizeof(ent->centerprint2));
@@ -2099,7 +2114,7 @@ qboolean Lithium_ClientCommand(edict_t *ent) {
 	else if(!Q_stricmp(cmd, "eval")) {
 		lvar_t *lvar = first_lvar;
 		while(lvar) {
-			if(!Q_strcasecmp(gi.argv(1), lvar->cvar->name)) {
+			if(!Q_stricmp(gi.argv(1), lvar->cvar->name)) {
 				gi.cprintf(ent, PRINT_HIGH, "\"%s\" is \"%s\"\n", lvar->cvar->name, lvar->cvar->string);
 				return true;
 			}

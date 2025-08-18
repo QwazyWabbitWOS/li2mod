@@ -89,7 +89,7 @@ void lmaster_lookup(void) {
 	net_addr = Net_Lookup(lmaster->string);
 	net_port = (int)lmaster_port->value;
 	if(net_addr == -1)
-		gi.dprintf("*** Bad lmaster hostname\n");
+		gi.dprintf("*** Bad lmaster hostname ***\n");
 }
 
 void LNet_InitGame(void) {
@@ -155,8 +155,8 @@ void LNet_Shutdown(void) {
 void LNet_Recv(char *buf);
 
 void LNet_RunFrame(void) {
-	char buf[BUF_LEN];
-	int len;
+	char buf[BUF_LEN] = { 0 };
+	int len = 0;
 
 	if(!net_init)
 		return;

@@ -28,8 +28,8 @@ static char *ClientTeam (edict_t *ent)
 
 qboolean OnSameTeam (edict_t *ent1, edict_t *ent2)
 {
-	char	ent1Team [512];
-	char	ent2Team [512];
+	char	ent1Team [MAX_INFO_STRING];
+	char	ent2Team [MAX_INFO_STRING];
 
 	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
 		return false;
@@ -793,8 +793,8 @@ void Cmd_Players_f (edict_t *ent)
 	int		i;
 	int		count;
 	char	small[64];
-	char	large[1280];
-	int		index[256];
+	char	large[1280] = { 0 };
+	int		index[256] = { 0 };
 
 	count = 0;
 	for (i = 0 ; i < maxclients->value ; i++)
@@ -975,7 +975,7 @@ void Cmd_PlayerList_f(edict_t *ent)
 {
 	int i;
 	char str[80];
-	char text[1400];
+	char text[1400] = { 0 };
 	edict_t *e2;
 
 	// connect time, ping, score, name

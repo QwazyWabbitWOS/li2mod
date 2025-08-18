@@ -333,13 +333,13 @@ char *GetNews(void) {
 	char add[256];
 	static char newsstr[1024];
 
-	file = fopen(file_gamedir(news_file->string), "rt");
+	file = fopen(file_gamedir(news->string), "rt");
 
 	isnews = false;
 
-	if(!file)
+	if (!file)
 		return "";
-
+	
 	lines = 0;
 	while(fgets(buf, 256, file))
 		lines++;
@@ -385,12 +385,12 @@ char *GetCenterprint(edict_t *ent) {
 
 	centerprint[0] = '\0';
 
-	if(ent->centerprint && ent->centerprint2 && strlen(ent->centerprint2))
+	if(strlen(ent->centerprint2))
 		Q_strncpyz(ent->centerprint, ent->centerprint2, sizeof(ent->centerprint));
 
-	if(ent->centerprint && strlen(ent->centerprint)) {
+	if(strlen(ent->centerprint)) {
 		int i, len, lines = 0;
-		char line[20][40];
+		char line[20][40] = { 0 };
 		char *c = ent->centerprint;
 		char *d = c;
 
@@ -419,7 +419,7 @@ char *GetCenterprint(edict_t *ent) {
 }
 
 int Layout_Update(edict_t *ent) {
-	char string[1024] = "";
+	char string[1024] = { 0 };
 	int size;
 
 	if(level.intermissiontime) {

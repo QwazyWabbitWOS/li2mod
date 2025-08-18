@@ -3,6 +3,9 @@
 #
 
 .DEFAULT_GOAL := game
+#
+# This builds the gamex86_64.so or gamei386.so for Linux.
+# Type make all or setarch i386 make all accordingly.
 
 # this nice line comes from the linux kernel makefile
 ARCH := $(shell uname -m | sed -e s/i.86/i386/ \
@@ -19,7 +22,7 @@ CC = gcc -std=c11 -Wall
 # this will let you build 32-bits on ia64 systems
 #
 # This is for native build
-CFLAGS=-O3 -DARCH="$(ARCH)" -DSTDC_HEADERS
+CFLAGS=-O3 -DARCH="$(ARCH)"# -DSTDC_HEADERS
 # This is for 32-bit build on 64-bit host
 ifeq ($(ARCH), i386)
 CFLAGS += -m32 -I/usr/include
@@ -58,7 +61,7 @@ GAME_SRCS = \
 	lithium.c l_display.c l_fragtrak.c l_gslog.c l_hook.c \
 	l_mapqueue.c l_nocamp.c l_obit.c l_pack.c l_rune.c \
 	l_var.c l_menu.c l_admin.c l_vote.c l_net.c net.c \
-	g_ctf.c l_hscore.c zbotcheck.c strl.c
+	g_ctf.c l_hscore.c zbotcheck.c
 
 GAME_OBJS = $(GAME_SRCS:%.c=$(BUILD_DIR)/%.o)
 # Pattern rule to place objects in build directory
@@ -68,10 +71,10 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 -include $(GAME_OBJS:.o=.d)
 
 # Build all object files that are out-of-date
-game: $(GAME_OBJS) game$(ARCH).real.$(SHLIBEXT)
+game: $(GAME_OBJS) lithium/game$(ARCH).$(SHLIBEXT)
 
 # Main target: depends on all object files
-game$(ARCH).real.$(SHLIBEXT) : $(GAME_OBJS)
+lithium/game$(ARCH).$(SHLIBEXT) : $(GAME_OBJS)
 	$(CC) $(CFLAGS) -shared -o $@ $(GAME_OBJS) -ldl -lm
 	$(LIBTOOL) -r $@
 	file $@
@@ -81,7 +84,7 @@ all:
 	$(MAKE) clean
 	$(MAKE) $(BUILD_DIR)
 	$(MAKE) $(GAME_OBJS)
-	$(MAKE) game$(ARCH).real.$(SHLIBEXT)
+	$(MAKE) lithium/game$(ARCH).$(SHLIBEXT)
 
 
 clean:

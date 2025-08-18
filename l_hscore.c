@@ -36,8 +36,7 @@ place_t *first_place;
 
 char *Highscores_File(void) {
 	static char buf[MAX_OSPATH];
-	Com_sprintf(buf, sizeof(buf), "%s/hiscores/%s.%02dm", gi.cvar("gamedir", 0, 0)->string,
-		level.mapname, (int)timelimit->value);
+	Com_sprintf(buf, sizeof(buf), "%s/hiscores/%s.%02dm", gi.cvar("gamedir", 0, 0)->string, level.mapname, (int)timelimit->value);
 	return buf;
 }
 
@@ -54,7 +53,9 @@ void Highscores_Read(void) {
 	if(file) {
 		while(fgets(buf, 64, file)) {
 			place = (place_t *)gi.TagMalloc(sizeof(place_t), TAG_LEVEL);
-			sscanf(buf, "%d;%[^';'];%s\r\n", &place->score, place->name, place->date);
+			if (sscanf(buf, "%d;%[^';'];%s\r\n", &place->score, place->name, place->date) != 3) {
+				gi.dprintf("Highscores line did not parse correctly.\n");
+			}
 
 			if(p == 0)
 				first_place = place;

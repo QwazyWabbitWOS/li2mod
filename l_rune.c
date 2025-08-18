@@ -58,6 +58,7 @@ int rune_count[NUM_RUNES] = { 0, 0, 0, 0, 0 };
 int rune_total = 0;
 
 static int Rune_IsInSolid(edict_t *ent); //QW//
+
 void UseRunesChanged(void) {
 	if(!use_runes->value)
 		Rune_RemoveAll();
@@ -275,6 +276,7 @@ void Rune_Touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 
 void Rune_Remove(edict_t *self) {
 	int i;
+
 	for(i = 0; i < NUM_RUNES; i++) {
 		if(self->rune & 1 << i) {
 			rune_count[i]--;
@@ -368,9 +370,14 @@ void Rune_ClientFrame(edict_t *player) {
 	}
 }
 
+//QW//
 static int Rune_IsInSolid(edict_t *ent) {
+	//if (gi.pointcontents(ent->s.origin) & CONTENTS_SOLID)
+	//	gi.dprintf("Rune 0x%x type %i is in solid, time %.1f\n", ent, ent->rune, level.time);
 	return gi.pointcontents(ent->s.origin) & CONTENTS_SOLID;
 }
+//QW//
+
 int Rune_HasHaste(edict_t *player) {
 	return player->rune & RUNE_HASTE;
 }
