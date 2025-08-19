@@ -976,6 +976,40 @@ size_t Q_strncatz(char* dst, const char* src, size_t dstSize)
 	return (dLen + (s - src));    // returned count excludes NULL terminator
 }
 
+/*
+ ***********************
+ Case insensitive strstr
+ ***********************
+ */
+char* Q_stristr(const char* str1, const char* str2)
+{
+	char* cp = (char*)str1;
+	char* s1, * s2;
+
+	if (!str1 || !str2)
+		return NULL;
+
+	if (!*str2)
+		return((char*)str1);
+
+	while (*cp)
+	{
+		s1 = cp;
+		s2 = (char*)str2;
+
+		while (*s1 && *s2 && !(Q_tolower(*s1) - Q_tolower(*s2))) {
+			s1++; s2++;
+		}
+
+		if (!*s2)
+			return(cp);
+
+		cp++;
+	}
+
+	return NULL;
+}
+
 
 /*
 =====================================================================
