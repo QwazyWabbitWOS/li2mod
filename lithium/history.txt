@@ -26,6 +26,8 @@ Matt went to a lot of trouble to set qver to account for engine versions after 3
 so I preserved that functionality and it sets qver = 3.20 for advanced servers
 like q2pro that don't follow the 3.xx format in their version strings.
 The discovered version information is printed after the module startup banner.
+Added Q_stristr function for case-insensitive string find. This is used in
+Lithium_InitGame for sensing advanced engine versions.
 
 v1.31 - Sep 2010
 ----------------------------------------------------------------------------

@@ -198,9 +198,12 @@ inline int Q_tolower(int c)
 	return c;
 }
 
+// Case insensitive string comparison
 int Q_stricmp(const char* s1, const char* s2);
 size_t Q_strncpyz(char* dst, const char* src, size_t dstSize);
 size_t Q_strncatz(char* dst, const char* src, size_t dstSize);
+// Case insensitive strstr
+char* Q_stristr(const char* str1, const char* str2);
 
 //=============================================
 
