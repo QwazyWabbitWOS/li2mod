@@ -977,34 +977,43 @@ size_t Q_strncatz(char* dst, const char* src, size_t dstSize)
 }
 
 /*
- ***********************
- Case insensitive strstr
- ***********************
- */
+================================
+Case insensitive substring search with performance optimizations
+================================
+*/
 char* Q_stristr(const char* str1, const char* str2)
 {
-	char* cp = (char*)str1;
-	char* s1, * s2;
-
 	if (!str1 || !str2)
 		return NULL;
 
 	if (!*str2)
-		return((char*)str1);
+		return (char*)str1;
 
-	while (*cp)
-	{
-		s1 = cp;
-		s2 = (char*)str2;
+	// Cache the first character to search for. (case-insensitive)
+	const char first = Q_tolower(*str2);
+	const size_t len2 = strlen(str2);
 
-		while (*s1 && *s2 && !(Q_tolower(*s1) - Q_tolower(*s2))) {
-			s1++; s2++;
+	// Main search loop
+	for (const char* cp = str1; *cp; cp++) {
+		// Quick first character check before doing more expensive comparison.
+		if (Q_tolower(*cp) == first) {
+			// Potential match found, check the rest.
+			const char* s1 = cp + 1;
+			const char* s2 = str2 + 1;
+			size_t matched = 1;
+
+			while (*s1 && *s2) {
+				if (Q_tolower(*s1) != Q_tolower(*s2))
+					break;
+				s1++;
+				s2++;
+				matched++;
+			}
+
+			// If we matched the full length of str2, we found it.
+			if (matched == len2)
+				return (char*)cp;
 		}
-
-		if (!*s2)
-			return(cp);
-
-		cp++;
 	}
 
 	return NULL;
