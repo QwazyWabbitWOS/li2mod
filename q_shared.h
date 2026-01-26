@@ -4,9 +4,8 @@
 
 #ifdef _WIN32
 #pragma warning(disable : 4100)	// C4100 unreferenced formal parameter
-#pragma warning(disable : 4152)	// C4152: nonstandard extension, function/data pointer conversion in expression
 #pragma warning(disable : 4244)	// C4244 conversion from 'type1' to 'type2', possible loss of data
-//#pragma warning(disable : 4996)	// disable warnings from VS 2010 about deprecated CRT functions (_CRT_SECURE_NO_WARNINGS).
+#pragma warning(disable : 4996)	// unsafe CRT functions (_CRT_SECURE_NO_WARNINGS).
 #endif
 
 #include <assert.h>

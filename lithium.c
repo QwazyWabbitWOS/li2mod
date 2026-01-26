@@ -100,9 +100,9 @@ void Lithium_InitGame(void) {
 	cvar_t* version = gi.cvar("version", 0, 0); //QW make engine version known to dll
 	gi.dprintf("%s detected %s\n", __func__, version->string);
 	if (!sscanf(version->string, "%f", &qver)) {
-			qver = 3.20f; //QW Just assert version 3.20 when using advanced servers.
-			gi.dprintf("%s is setting qver = %1.2f for internal engine version number.\n", __func__, qver);
-		}
+		qver = 3.20f; //QW Just assert version 3.20 when using advanced servers.
+		gi.dprintf("%s is setting qver = %1.2f for internal engine version number.\n", __func__, qver);
+	}
 
 	ofp_base = lvar("ofp_base", "20", "##", VAR_NONE);
 	ofp_perplayer = lvar("ofp_perplayer", "0.75", "#.##", VAR_NONE);

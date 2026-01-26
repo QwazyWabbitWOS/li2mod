@@ -31,6 +31,7 @@ size_t Q_strncpyz(char* dst, const char* src, size_t dstSize);
 
 #ifdef _WIN32
 #pragma warning(disable : 4100)	// C4100 unreferenced formal parameter
+#pragma warning(disable : 4996)	// unsafe CRT functions (_CRT_SECURE_NO_WARNINGS).
 #endif
 
 #ifdef _WIN32
