@@ -237,14 +237,14 @@ void EndDMLevel (void)
 						BeginIntermission (CreateTargetChangeLevel (f) );
 				} else
 					BeginIntermission (CreateTargetChangeLevel (t) );
-				free(s);
+				gi.TagFree(s);
 				return;
 			}
 			if (!f)
 				f = t;
 			t = strtok(NULL, seps);
 		}
-		free(s);
+		gi.TagFree(s);
 	}
 
 	if (level.nextmap[0]) // go to a specific map

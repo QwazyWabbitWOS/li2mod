@@ -142,7 +142,7 @@ void Menu_Destroy(edict_t *ent) {
 #define MARGIN_X 16
 
 char *Menu_GetLine(edict_t *ent, menuline_t *menuline, qboolean sel) {
-	static char line[80];
+	static char line[80] = { 0 };
 	char right[20] = "";
 	char string[40];
 	char format[40];
