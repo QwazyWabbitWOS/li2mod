@@ -1424,8 +1424,8 @@ void CTFWeapon_Grapple (edict_t *ent)
 
 void CTFTeam_f (edict_t *ent)
 {
-	char* t = "";
-	char* s = "";
+	char* t;
+	char* s;
 	int desired_team;
 
 	t = gi.args();
@@ -1434,9 +1434,9 @@ void CTFTeam_f (edict_t *ent)
 			CTFTeamName(ent->client->resp.ctf_team));
 		return;
 	}
-	if (Q_stricmp(t, "red") == 0)
+	if (strncmp(t, "red", 3) == 0)
 		desired_team = CTF_TEAM1;
-	else if (Q_stricmp(t, "blue") == 0)
+	else if (strncmp(t, "blue", 4) == 0)
 		desired_team = CTF_TEAM2;
 	else {
 		gi.cprintf(ent, PRINT_HIGH, "Unknown team %s.\n", t);

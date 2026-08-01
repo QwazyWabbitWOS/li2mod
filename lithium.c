@@ -24,7 +24,7 @@
 
 #include "g_local.h"
 
-float lithium_ver = 1.33f; //QW Not sure why this is float and not a #define
+float lithium_ver = 1.34f; //QW Not sure why this is float and not a #define
 int lithium_beta = 2;
 
 char lithium_version[16]; //QW// Used in 'ver' user command and in lithium_modname.
